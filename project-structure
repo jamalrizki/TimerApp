@@ -1,0 +1,8 @@
+src/
+  ├── components/
+  ├── screens/
+  ├── context/
+  ├── navigation/
+  ├── hooks/
+  ├── utils/
+  └── constants/ 
