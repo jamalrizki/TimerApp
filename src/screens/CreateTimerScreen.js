@@ -1,43 +1,31 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, ScrollView, TextInput, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, TextInput, TouchableOpacity, Modal } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useTimerContext } from '../hooks/useTimerContext';
 import Button from '../components/Button';
+import { timerTemplates } from '../constants/timerTemplates';
+import TimePicker from '../components/TimePicker';
 
 const CreateTimerScreen = ({ navigation, route }) => {
-  const { folderId } = route.params || {};
+  const { folderId, template } = route.params || {};
   const { saveTimer } = useTimerContext();
-  const [name, setName] = useState('');
-  const [intervals, setIntervals] = useState([
-    { duration: 300, type: 'work' }
-  ]);
-
-  const addInterval = (type) => {
-    setIntervals([...intervals, { duration: 300, type }]);
-  };
-
-  const removeInterval = (index) => {
-    setIntervals(intervals.filter((_, i) => i !== index));
-  };
-
-  const updateInterval = (index, field, value) => {
-    const updatedIntervals = [...intervals];
-    if (field === 'duration') {
-      const [minutes, seconds] = value.split(':').map(Number);
-      const totalSeconds = (minutes * 60) + (seconds || 0);
-      updatedIntervals[index] = { ...updatedIntervals[index], duration: totalSeconds };
-    } else {
-      updatedIntervals[index] = { ...updatedIntervals[index], [field]: value };
-    }
-    setIntervals(updatedIntervals);
-  };
+  const [name, setName] = useState(template ? template.name : '');
+  const [duration, setDuration] = useState({
+    hours: '00',
+    minutes: '05',
+    seconds: '00'
+  });
 
   const handleSave = () => {
+    const totalSeconds = 
+      (parseInt(duration.hours) * 3600) + 
+      (parseInt(duration.minutes) * 60) + 
+      parseInt(duration.seconds);
+
     const newTimer = {
       id: Date.now().toString(),
       name: name || 'New Timer',
-      duration: intervals.reduce((total, interval) => total + interval.duration, 0),
-      intervals,
+      duration: totalSeconds,
       createdAt: new Date().toISOString(),
       folderId: folderId,
     };
@@ -46,87 +34,31 @@ const CreateTimerScreen = ({ navigation, route }) => {
   };
 
   return (
-    <ScrollView style={styles.container}>
+    <View style={styles.container}>
       <Text style={styles.label}>Timer Name</Text>
       <TextInput
         style={styles.input}
         value={name}
         onChangeText={setName}
-        placeholder="Enter timer name"
+        placeholder="Timer name"
       />
 
-      <Text style={styles.label}>Intervals</Text>
-      {intervals.map((interval, index) => (
-        <View key={index} style={styles.intervalContainer}>
-          <View style={styles.intervalHeader}>
-            <Text style={styles.intervalTitle}>Interval {index + 1}</Text>
-            {intervals.length > 1 && (
-              <TouchableOpacity onPress={() => removeInterval(index)}>
-                <Ionicons name="trash-outline" size={24} color="#F44336" />
-              </TouchableOpacity>
-            )}
-          </View>
+      <Text style={styles.label}>Duration</Text>
+      <TimePicker
+        hours={duration.hours}
+        minutes={duration.minutes}
+        seconds={duration.seconds}
+        onChange={(field, value) => setDuration(prev => ({ ...prev, [field]: value }))}
+      />
 
-          <View style={styles.durationContainer}>
-            <Text style={styles.durationLabel}>Duration (mm:ss)</Text>
-            <TextInput
-              style={styles.durationInput}
-              value={`${Math.floor(interval.duration / 60)}:${(interval.duration % 60).toString().padStart(2, '0')}`}
-              onChangeText={(value) => updateInterval(index, 'duration', value)}
-              placeholder="05:00"
-              keyboardType="numbers-and-punctuation"
-            />
-          </View>
-
-          <View style={styles.typeContainer}>
-            <Text style={styles.typeLabel}>Type</Text>
-            <View style={styles.typeButtons}>
-              <TouchableOpacity
-                style={[
-                  styles.typeButton,
-                  interval.type === 'work' && styles.typeButtonActive
-                ]}
-                onPress={() => updateInterval(index, 'type', 'work')}
-              >
-                <Text style={interval.type === 'work' ? styles.typeTextActive : styles.typeText}>
-                  Work
-                </Text>
-              </TouchableOpacity>
-              <TouchableOpacity
-                style={[
-                  styles.typeButton,
-                  interval.type === 'break' && styles.typeButtonActive
-                ]}
-                onPress={() => updateInterval(index, 'type', 'break')}
-              >
-                <Text style={interval.type === 'break' ? styles.typeTextActive : styles.typeText}>
-                  Break
-                </Text>
-              </TouchableOpacity>
-            </View>
-          </View>
-        </View>
-      ))}
-
-      <View style={styles.addButtons}>
+      <View style={styles.buttonsContainer}>
         <Button
-          title="Add Work Interval"
-          onPress={() => addInterval('work')}
-          style={styles.addWorkButton}
-        />
-        <Button
-          title="Add Break Interval"
-          onPress={() => addInterval('break')}
-          style={styles.addBreakButton}
+          title="Save Changes"
+          onPress={handleSave}
+          style={styles.saveButton}
         />
       </View>
-
-      <Button
-        title="Save Timer"
-        onPress={handleSave}
-        style={styles.saveButton}
-      />
-    </ScrollView>
+    </View>
   );
 };
 
@@ -150,79 +82,10 @@ const styles = StyleSheet.create({
     marginBottom: 16,
     fontSize: 16,
   },
-  intervalContainer: {
-    backgroundColor: '#f5f5f5',
-    padding: 16,
-    borderRadius: 8,
-    marginBottom: 16,
-  },
-  intervalHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: 12,
-  },
-  intervalTitle: {
-    fontSize: 16,
-    fontWeight: '600',
-  },
-  durationContainer: {
-    marginBottom: 12,
-  },
-  durationLabel: {
-    fontSize: 14,
-    marginBottom: 4,
-    color: '#666',
-  },
-  durationInput: {
-    borderWidth: 1,
-    borderColor: '#ddd',
-    borderRadius: 8,
-    padding: 12,
-    fontSize: 16,
-  },
-  typeContainer: {
-    marginBottom: 8,
-  },
-  typeLabel: {
-    fontSize: 14,
-    marginBottom: 4,
-    color: '#666',
-  },
-  typeButtons: {
-    flexDirection: 'row',
-    gap: 8,
-  },
-  typeButton: {
-    flex: 1,
-    padding: 8,
-    borderRadius: 8,
-    borderWidth: 1,
-    borderColor: '#ddd',
-    alignItems: 'center',
-  },
-  typeButtonActive: {
-    backgroundColor: '#007AFF',
-    borderColor: '#007AFF',
-  },
-  typeText: {
-    color: '#666',
-  },
-  typeTextActive: {
-    color: '#fff',
-  },
-  addButtons: {
+  buttonsContainer: {
     flexDirection: 'row',
     gap: 8,
     marginBottom: 24,
-  },
-  addWorkButton: {
-    flex: 1,
-    backgroundColor: '#4CAF50',
-  },
-  addBreakButton: {
-    flex: 1,
-    backgroundColor: '#FFA000',
   },
   saveButton: {
     backgroundColor: '#007AFF',

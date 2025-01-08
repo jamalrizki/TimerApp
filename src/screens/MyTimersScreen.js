@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, StyleSheet, ScrollView } from 'react-native';
+import { View, Text, ScrollView, StyleSheet } from 'react-native';
 import { useTimerContext } from '../hooks/useTimerContext';
 import Button from '../components/Button';
 import FolderList from '../components/FolderList';
@@ -17,9 +17,9 @@ const MyTimersScreen = ({ navigation }) => {
 
   return (
     <ScrollView style={styles.container}>
-      <Text style={styles.title}>My Timers</Text>
+      <Text style={styles.title}>My Timer Playlist</Text>
       <Button 
-        title="Create New Folder" 
+        title="Create New Playlist"
         onPress={() => navigation.navigate('CreateFolder')}
         style={styles.createButton}
       />
@@ -36,15 +36,17 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: 16,
-    backgroundColor: '#fff',
+    backgroundColor: '#1C1C1E',
   },
   title: {
     fontSize: 24,
     fontWeight: 'bold',
     marginBottom: 16,
+    color: '#fff',
   },
   createButton: {
     marginBottom: 16,
+    backgroundColor: '#00BFA5',
   },
 });
 

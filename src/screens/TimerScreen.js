@@ -16,7 +16,9 @@ const TimerScreen = ({ route, navigation }) => {
 
   const currentTimer = sequence ? sequence[currentSequenceIndex] : timer;
   const totalDuration = currentTimer.duration;
-  const currentIntervalType = currentTimer.intervals?.[0]?.type || 'work';
+  const currentInterval = currentTimer.intervals?.[0] || {};
+  const currentIntervalType = currentInterval.type || 'work';
+  const currentIntervalLabel = currentInterval.label || (currentIntervalType === 'work' ? 'Work' : 'Rest');
   const circleColor = currentIntervalType === 'work' ? '#4CAF50' : '#FFA000';
   
   // SVG Arc calculation
@@ -121,7 +123,7 @@ const TimerScreen = ({ route, navigation }) => {
     <View style={styles.container}>
       <Text style={styles.timerName}>{currentTimer.name}</Text>
       <Text style={[styles.intervalType, { color: circleColor }]}>
-        {currentIntervalType.charAt(0).toUpperCase() + currentIntervalType.slice(1)}
+        {currentIntervalLabel}
       </Text>
       {sequence && (
         <Text style={styles.sequenceProgress}>

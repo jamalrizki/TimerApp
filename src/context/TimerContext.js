@@ -30,32 +30,12 @@ export const TimerProvider = ({ children }) => {
 
   const saveTimer = async (newTimer) => {
     try {
-      const timerToSave = {
-        ...newTimer,
-        intervals: Array.isArray(newTimer.intervals) ? newTimer.intervals : [{
-          duration: newTimer.duration,
-          type: 'work',
-        }],
-      };
-      const updatedTimers = [...timers, timerToSave];
+      const updatedTimers = [...timers, newTimer];
       await AsyncStorage.setItem('timers', JSON.stringify(updatedTimers));
       setTimers(updatedTimers);
-
-      if (newTimer.folderId) {
-        const updatedFolders = folders.map(folder => {
-          if (folder.id === newTimer.folderId) {
-            return {
-              ...folder,
-              timers: [...(folder.timers || []), timerToSave.id]
-            };
-          }
-          return folder;
-        });
-        await AsyncStorage.setItem('folders', JSON.stringify(updatedFolders));
-        setFolders(updatedFolders);
-      }
     } catch (error) {
       console.error('Error saving timer:', error);
+      throw error;
     }
   };
 
@@ -86,6 +66,33 @@ export const TimerProvider = ({ children }) => {
     }
   };
 
+  const deleteTimer = async (timerId) => {
+    try {
+      const updatedTimers = timers.filter(timer => timer.id !== timerId);
+      await AsyncStorage.setItem('timers', JSON.stringify(updatedTimers));
+      setTimers(updatedTimers);
+    } catch (error) {
+      console.error('Error deleting timer:', error);
+      throw error;
+    }
+  };
+
+  const deleteFolder = async (folderId) => {
+    try {
+      const updatedFolders = folders.filter(folder => folder.id !== folderId);
+      const updatedTimers = timers.filter(timer => timer.folderId !== folderId);
+      await Promise.all([
+        AsyncStorage.setItem('folders', JSON.stringify(updatedFolders)),
+        AsyncStorage.setItem('timers', JSON.stringify(updatedTimers))
+      ]);
+      setFolders(updatedFolders);
+      setTimers(updatedTimers);
+    } catch (error) {
+      console.error('Error deleting folder:', error);
+      throw error;
+    }
+  };
+
   const value = {
     timers,
     setTimers,
@@ -96,6 +103,8 @@ export const TimerProvider = ({ children }) => {
     saveTimer,
     saveFolder,
     updateTimer,
+    deleteTimer,
+    deleteFolder,
   };
 
   return (

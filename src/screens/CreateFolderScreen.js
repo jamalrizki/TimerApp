@@ -20,15 +20,15 @@ const CreateFolderScreen = ({ navigation }) => {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.label}>Folder Name</Text>
+      <Text style={styles.label}>Playlist Name</Text>
       <TextInput
         style={styles.input}
         value={name}
         onChangeText={setName}
-        placeholder="Enter folder name"
+        placeholder="Enter Playlist name"
       />
       <Button
-        title="Create Folder"
+        title="Create Playlist"
         onPress={handleCreate}
         style={styles.createButton}
       />

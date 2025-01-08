@@ -1,19 +1,21 @@
 import React from 'react';
-import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, Animated, Alert } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useTimerContext } from '../hooks/useTimerContext';
-import { useNavigation } from '@react-navigation/native';
+import { Swipeable } from 'react-native-gesture-handler';
 
 const FolderList = ({ folders, timers, navigation }) => {
+  const { deleteFolder } = useTimerContext();
+
   if (!folders || !timers) return null;
 
   return (
     <View style={styles.container}>
       <View style={styles.header}>
-        <Text style={styles.title}>Folders</Text>
+        <Text style={styles.title}>Playlists</Text>
       </View>
       {folders.length === 0 ? (
-        <Text style={styles.emptyText}>No folders yet</Text>
+        <Text style={styles.emptyText}>No Playlists yet</Text>
       ) : (
         folders.map((folder) => {
           const folderTimers = timers.filter(timer => 
@@ -21,17 +23,43 @@ const FolderList = ({ folders, timers, navigation }) => {
           );
           
           return (
-            <TouchableOpacity 
+            <Swipeable
               key={folder.id}
-              style={styles.folderItem}
-              onPress={() => navigation.navigate('FolderDetail', { folder })}
+              renderRightActions={(progress, dragX) => (
+                <Animated.View style={styles.deleteAction}>
+                  <TouchableOpacity
+                    onPress={() => {
+                      Alert.alert(
+                        'Delete Playlist',
+                        'Are you sure you want to delete this playlist and all its timers?',
+                        [
+                          { text: 'Cancel', style: 'cancel' },
+                          {
+                            text: 'Delete',
+                            style: 'destructive',
+                            onPress: () => deleteFolder(folder.id),
+                          },
+                        ]
+                      );
+                    }}
+                    style={styles.deleteButton}
+                  >
+                    <Ionicons name="trash-outline" size={24} color="#fff" />
+                  </TouchableOpacity>
+                </Animated.View>
+              )}
             >
-              <Ionicons name="folder-outline" size={24} color="#007AFF" />
-              <Text style={styles.folderName}>{folder.name}</Text>
-              <Text style={styles.timerCount}>
-                {folderTimers.length} timers
-              </Text>
-            </TouchableOpacity>
+              <TouchableOpacity 
+                style={styles.folderItem}
+                onPress={() => navigation.navigate('FolderDetail', { folder })}
+              >
+                <Ionicons name="folder-outline" size={24} color="#007AFF" />
+                <Text style={styles.folderName}>{folder.name}</Text>
+                <Text style={styles.timerCount}>
+                  {folderTimers.length} timers
+                </Text>
+              </TouchableOpacity>
+            </Swipeable>
           );
         })
       )}
@@ -52,6 +80,7 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 18,
     fontWeight: 'bold',
+    color: 'white'
   },
   folderItem: {
     flexDirection: 'row',
@@ -75,6 +104,18 @@ const styles = StyleSheet.create({
     fontStyle: 'italic',
     textAlign: 'center',
     marginTop: 8,
+  },
+  deleteAction: {
+    backgroundColor: '#ff3b30',
+    justifyContent: 'center',
+    alignItems: 'center',
+    width: 80,
+    height: '100%',
+  },
+  deleteButton: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
 });
 

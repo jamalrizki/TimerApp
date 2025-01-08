@@ -13,19 +13,24 @@ const TimerStackNavigator = () => {
   return (
     <Stack.Navigator>
       <Stack.Screen 
-        name="TimersList" 
+        name="MyTimers"
         component={MyTimersScreen}
         options={{ headerShown: false }}
       />
       <Stack.Screen 
         name="CreateFolder" 
         component={CreateFolderScreen}
-        options={{ title: 'Create Folder' }}
+        options={{ title: 'Create Playlist' }}
       />
       <Stack.Screen 
         name="FolderDetail"
         component={FolderDetailScreen}
-        options={{ title: 'Folder Details' }}
+        options={{ title: 'Playlist Details' }}
+      />
+      <Stack.Screen 
+        name="CreateTimer" 
+        component={CreateTimerScreen}
+        options={{ title: 'Create Timer' }}
       />
       <Stack.Screen 
         name="TimerDetails" 
@@ -36,11 +41,6 @@ const TimerStackNavigator = () => {
         name="Timer" 
         component={TimerScreen}
         options={{ title: 'Timer' }}
-      />
-      <Stack.Screen 
-        name="CreateTimer" 
-        component={CreateTimerScreen}
-        options={{ title: 'Create Timer' }}
       />
     </Stack.Navigator>
   );
