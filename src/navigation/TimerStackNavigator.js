@@ -3,7 +3,6 @@ import { createStackNavigator } from '@react-navigation/stack';
 import MyTimersScreen from '../screens/MyTimersScreen';
 import TimerDetailsScreen from '../screens/TimerDetailsScreen';
 import TimerScreen from '../screens/TimerScreen';
-import CreateTimerScreen from '../screens/CreateTimerScreen';
 import CreateFolderScreen from '../screens/CreateFolderScreen';
 import FolderDetailScreen from '../screens/FolderDetailScreen';
 
@@ -11,11 +10,22 @@ const Stack = createStackNavigator();
 
 const TimerStackNavigator = () => {
   return (
-    <Stack.Navigator>
+    <Stack.Navigator
+      screenOptions={{
+        headerStyle: {
+          backgroundColor: '#1C1C1E',
+        },
+        headerTitleStyle: {
+          color: '#fff',
+        },
+        headerTintColor: '#00BFA5',
+        headerBackTitle: 'My Timers',
+      }}
+    >
       <Stack.Screen 
         name="MyTimers"
         component={MyTimersScreen}
-        options={{ headerShown: false }}
+        options={{ title: 'My Timers' }}
       />
       <Stack.Screen 
         name="CreateFolder" 
@@ -25,17 +35,17 @@ const TimerStackNavigator = () => {
       <Stack.Screen 
         name="FolderDetail"
         component={FolderDetailScreen}
-        options={{ title: 'Playlist Details' }}
-      />
-      <Stack.Screen 
-        name="CreateTimer" 
-        component={CreateTimerScreen}
-        options={{ title: 'Create Timer' }}
+        options={{ 
+          title: 'Playlist Details', 
+          headerBackTitle: 'My Timers'
+        }}
       />
       <Stack.Screen 
         name="TimerDetails" 
         component={TimerDetailsScreen}
-        options={{ title: 'Timer Details' }}
+        options={({ route }) => ({ 
+          title: route.params?.timer ? 'Timer Details' : 'Create Timer'
+        })}
       />
       <Stack.Screen 
         name="Timer" 

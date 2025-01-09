@@ -5,14 +5,16 @@ import Button from '../components/Button';
 import TimePicker from '../components/TimePicker';
 
 const TimerDetailsScreen = ({ route, navigation }) => {
-  const { timer } = route.params;
-  const { timers, saveTimer, updateTimer } = useTimerContext();
+  const { timer, folderId } = route.params;
+  const isEditing = !!timer;
+  const { timers, saveTimer, updateTimer, deleteTimer } = useTimerContext();
   
-  const [name, setName] = useState(timer.name);
+  const [name, setName] = useState(timer?.name || '');
+  const [description, setDescription] = useState(timer?.description || '');
   const [duration, setDuration] = useState({
-    hours: Math.floor(timer.duration / 3600),
-    minutes: Math.floor((timer.duration % 3600) / 60),
-    seconds: timer.duration % 60,
+    hours: timer ? Math.floor(timer.duration / 3600) : 0,
+    minutes: timer ? Math.floor((timer.duration % 3600) / 60) : 5,
+    seconds: timer ? timer.duration % 60 : 0,
   });
 
   const handleSave = async () => {
@@ -27,21 +29,29 @@ const TimerDetailsScreen = ({ route, navigation }) => {
         return;
       }
 
-      const updatedTimer = {
-        ...timer,
-        name,
-        duration: totalSeconds,
-        intervals: [{
+      if (isEditing) {
+        const updatedTimer = {
+          ...timer,
+          name,
+          description,
           duration: totalSeconds,
-          type: timer.intervals[0].type
-        }]
-      };
-
-      await updateTimer(updatedTimer);
+        };
+        await updateTimer(updatedTimer);
+      } else {
+        const newTimer = {
+          id: Date.now().toString(),
+          name: name || 'New Timer',
+          description: description || 'Work',
+          duration: totalSeconds,
+          createdAt: new Date().toISOString(),
+          folderId: folderId,
+        };
+        await saveTimer(newTimer);
+      }
       navigation.goBack();
     } catch (error) {
-      console.error('Error updating timer:', error);
-      Alert.alert('Error', 'Failed to update timer');
+      console.error('Error saving timer:', error);
+      Alert.alert('Error', 'Failed to save timer');
     }
   };
 
@@ -68,12 +78,22 @@ const TimerDetailsScreen = ({ route, navigation }) => {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.label}>Timer Name</Text>
+      <Text style={styles.label}>{isEditing ? 'Edit Timer' : 'New Timer'}</Text>
       <TextInput
         style={styles.input}
         value={name}
         onChangeText={setName}
         placeholder="Timer name"
+        placeholderTextColor="#8E8E93"
+      />
+
+      <Text style={styles.label}>Description</Text>
+      <TextInput
+        style={styles.input}
+        value={description}
+        onChangeText={setDescription}
+        placeholder="Timer description (e.g., 'Warm up', 'Sprint')"
+        placeholderTextColor="#8E8E93"
       />
 
       <Text style={styles.label}>Duration</Text>
@@ -86,16 +106,18 @@ const TimerDetailsScreen = ({ route, navigation }) => {
 
       <View style={styles.buttonsContainer}>
         <Button
-          title="Save Changes"
+          title={isEditing ? "Save Changes" : "Create Timer"}
           onPress={handleSave}
           style={styles.saveButton}
         />
-        <TouchableOpacity
-          style={styles.deleteButton}
-          onPress={handleDelete}
-        >
-          <Text style={styles.deleteButtonText}>Delete Timer</Text>
-        </TouchableOpacity>
+        {isEditing && (
+          <TouchableOpacity
+            style={styles.deleteButton}
+            onPress={handleDelete}
+          >
+            <Text style={styles.deleteButtonText}>Delete Timer</Text>
+          </TouchableOpacity>
+        )}
       </View>
     </View>
   );
@@ -105,21 +127,23 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: 16,
-    backgroundColor: '#fff',
+    backgroundColor: '#1C1C1E',
   },
   label: {
     fontSize: 16,
     fontWeight: '600',
     marginBottom: 8,
-    color: '#333',
+    color: '#fff',
   },
   input: {
     borderWidth: 1,
-    borderColor: '#ddd',
+    borderColor: '#2C2C2E',
+    backgroundColor: '#2C2C2E',
     borderRadius: 8,
     padding: 12,
     marginBottom: 16,
     fontSize: 16,
+    color: '#fff',
   },
   durationContainer: {
     flexDirection: 'row',
@@ -135,10 +159,10 @@ const styles = StyleSheet.create({
     marginHorizontal: 8,
   },
   saveButton: {
-    backgroundColor: '#4CAF50',
+    backgroundColor: '#00BFA5',
   },
   deleteButton: {
-    backgroundColor: '#fff',
+    backgroundColor: '#2C2C2E',
     paddingVertical: 12,
     borderRadius: 8,
     alignItems: 'center',

@@ -1,68 +1,33 @@
 import React from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Animated, Alert } from 'react-native';
-import { Swipeable } from 'react-native-gesture-handler';
-import { Ionicons } from '@expo/vector-icons';
-import { useTimerContext } from '../hooks/useTimerContext';
+import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
+import { useNavigation } from '@react-navigation/native';
 
 const RecentTimers = ({ timers = [] }) => {
-  const { deleteTimer } = useTimerContext();
-
-  const renderRightActions = (progress, dragX, timer) => {
-    const trans = dragX.interpolate({
-      inputRange: [-100, 0],
-      outputRange: [0, 100],
-    });
-
-    return (
-      <Animated.View
-        style={[
-          styles.deleteAction,
-          {
-            transform: [{ translateX: trans }],
-          },
-        ]}
-      >
-        <TouchableOpacity
-          onPress={() => {
-            Alert.alert(
-              'Delete Timer',
-              'Are you sure you want to delete this timer?',
-              [
-                { text: 'Cancel', style: 'cancel' },
-                {
-                  text: 'Delete',
-                  style: 'destructive',
-                  onPress: () => deleteTimer(timer.id),
-                },
-              ]
-            );
-          }}
-          style={styles.deleteButton}
-        >
-          <Ionicons name="trash-outline" size={24} color="#fff" />
-        </TouchableOpacity>
-      </Animated.View>
-    );
-  };
+  const navigation = useNavigation();
 
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Recent Timers</Text>
       {timers.map((timer, index) => (
-        <Swipeable
+        <TouchableOpacity
           key={timer.id || index}
-          renderRightActions={(progress, dragX) => 
-            renderRightActions(progress, dragX, timer)
-          }
+          style={styles.timerItem}
+          onPress={() => navigation.navigate('My Timers', {
+            screen: 'FolderDetail',
+            params: { 
+              folder: {
+                id: timer.folderId,
+                name: timer.name
+              }
+            }
+          })}
         >
-          <View style={styles.timerItem}>
-            <Text style={styles.timerName}>{timer.name || 'Unnamed Timer'}</Text>
-            <Text style={styles.duration}>
-              {Math.floor(timer.duration / 60)}:
-              {(timer.duration % 60).toString().padStart(2, '0')}
-            </Text>
-          </View>
-        </Swipeable>
+          <Text style={styles.timerName}>{timer.name || 'Unnamed Timer'}</Text>
+          <Text style={styles.duration}>
+            {Math.floor(timer.duration / 60)}:
+            {(timer.duration % 60).toString().padStart(2, '0')}
+          </Text>
+        </TouchableOpacity>
       ))}
       {timers.length === 0 && (
         <Text style={styles.emptyText}>No recent timers</Text>
@@ -102,18 +67,6 @@ const styles = StyleSheet.create({
   emptyText: {
     color: '#8E8E93',
     fontStyle: 'italic',
-  },
-  deleteAction: {
-    backgroundColor: '#ff3b30',
-    justifyContent: 'center',
-    alignItems: 'center',
-    width: 80,
-    height: '100%',
-  },
-  deleteButton: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
   },
 });
 

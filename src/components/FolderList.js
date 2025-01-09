@@ -53,11 +53,28 @@ const FolderList = ({ folders, timers, navigation }) => {
                 style={styles.folderItem}
                 onPress={() => navigation.navigate('FolderDetail', { folder })}
               >
-                <Ionicons name="folder-outline" size={24} color="#007AFF" />
-                <Text style={styles.folderName}>{folder.name}</Text>
-                <Text style={styles.timerCount}>
-                  {folderTimers.length} timers
-                </Text>
+                <View style={styles.folderContent}>
+                  <View style={styles.folderInfo}>
+                    <Text style={styles.folderName}>{folder.name}</Text>
+                    <Text style={styles.timerCount}>
+                      {folderTimers.length} intervals
+                    </Text>
+                  </View>
+                  <TouchableOpacity 
+                    style={styles.playButton}
+                    onPress={() => {
+                      if (folderTimers.length > 0) {
+                        navigation.navigate('Timer', {
+                          timer: folderTimers[0],
+                          sequence: folderTimers,
+                          currentIndex: 0
+                        });
+                      }
+                    }}
+                  >
+                    <Ionicons name="play" size={24} color="#00BFA5" />
+                  </TouchableOpacity>
+                </View>
               </TouchableOpacity>
             </Swipeable>
           );
@@ -83,24 +100,39 @@ const styles = StyleSheet.create({
     color: 'white'
   },
   folderItem: {
-    flexDirection: 'row',
-    alignItems: 'center',
     padding: 12,
-    backgroundColor: '#f5f5f5',
+    backgroundColor: '#2C2C2E',
     borderRadius: 8,
     marginBottom: 8,
   },
-  folderName: {
-    marginLeft: 12,
-    fontSize: 16,
+  folderContent: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
+  folderInfo: {
     flex: 1,
   },
+  folderName: {
+    fontSize: 16,
+    fontWeight: '500',
+    color: '#fff',
+    marginBottom: 4,
+  },
   timerCount: {
-    color: '#666',
+    color: '#8E8E93',
     fontSize: 14,
   },
+  playButton: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: '#1C1C1E',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
   emptyText: {
-    color: '#666',
+    color: '#8E8E93',
     fontStyle: 'italic',
     textAlign: 'center',
     marginTop: 8,

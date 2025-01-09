@@ -68,7 +68,7 @@ const FolderDetailScreen = ({ route, navigation }) => {
       <View style={styles.buttonContainer}>
         <Button 
           title="Add Interval"
-          onPress={() => navigation.navigate('CreateTimer', { folderId: folder.id })}
+          onPress={() => navigation.navigate('TimerDetails', { folderId: folder.id })}
           style={styles.createButton}
         />
         {folderTimers.length > 0 && (

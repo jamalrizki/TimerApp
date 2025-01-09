@@ -10,7 +10,7 @@ export default function App() {
     <GestureHandlerRootView style={{ flex: 1 }}>
       <TimerProvider>
         <NavigationContainer>
-          <StatusBar barStyle="dark-content" />
+          <StatusBar barStyle="light-content" />
           <RootNavigator />
         </NavigationContainer>
       </TimerProvider>

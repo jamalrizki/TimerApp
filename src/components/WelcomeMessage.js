@@ -19,10 +19,11 @@ const styles = StyleSheet.create({
     fontSize: 24,
     fontWeight: 'bold',
     marginBottom: 8,
+    color: "#fff",
   },
   subtitle: {
     fontSize: 16,
-    color: '#666',
+    color: '#8E8E93',
   },
 });
 

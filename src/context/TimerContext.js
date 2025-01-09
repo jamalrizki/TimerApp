@@ -1,5 +1,6 @@
 import React, { createContext, useState, useContext, useEffect } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { createFolderFromTemplate } from '../utils/templateUtils';
 
 export const TimerContext = createContext();
 
@@ -39,17 +40,31 @@ export const TimerProvider = ({ children }) => {
     }
   };
 
-  const saveFolder = async (newFolder) => {
+  const saveFolder = async (folder) => {
     try {
-      const folderToSave = {
-        ...newFolder,
-        timers: newFolder.timers || [],
-      };
-      const updatedFolders = [...folders, folderToSave];
+      const updatedFolders = [...(folders || []), folder];
       await AsyncStorage.setItem('folders', JSON.stringify(updatedFolders));
       setFolders(updatedFolders);
     } catch (error) {
       console.error('Error saving folder:', error);
+    }
+  };
+
+  const createFromTemplate = async (template) => {
+    try {
+      const { folder, timers: newTimers } = createFolderFromTemplate(template);
+      
+      // Save the folder
+      const updatedFolders = [...(folders || []), folder];
+      await AsyncStorage.setItem('folders', JSON.stringify(updatedFolders));
+      setFolders(updatedFolders);
+      
+      // Save all timers
+      const updatedTimers = [...(timers || []), ...newTimers];
+      await AsyncStorage.setItem('timers', JSON.stringify(updatedTimers));
+      setTimers(updatedTimers);
+    } catch (error) {
+      console.error('Error creating from template:', error);
     }
   };
 
@@ -105,6 +120,7 @@ export const TimerProvider = ({ children }) => {
     updateTimer,
     deleteTimer,
     deleteFolder,
+    createFromTemplate,
   };
 
   return (

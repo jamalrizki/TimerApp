@@ -1,25 +1,25 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { View, Text, StyleSheet } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import Svg, { Circle, Path } from 'react-native-svg';
+import { Ionicons } from '@expo/vector-icons';
 import Button from '../components/Button';
 
 const TimerScreen = ({ route, navigation }) => {
-  const { timer, sequence, currentIndex = 0 } = route.params;
+  const { timer, sequence, currentIndex: initialIndex = 0 } = route.params;
   const [timeLeft, setTimeLeft] = useState(timer.duration);
   const [isRunning, setIsRunning] = useState(false);
   const [isPaused, setIsPaused] = useState(false);
-  const [cycles, setCycles] = useState(0);
-  const [currentSequenceIndex, setCurrentSequenceIndex] = useState(currentIndex);
+  const [currentSequenceIndex, setCurrentSequenceIndex] = useState(initialIndex);
+  const [cycles, setCycles] = useState(1);
+  const [totalCycles, setTotalCycles] = useState(1);
   const [shouldExit, setShouldExit] = useState(false);
   
   const timerRef = useRef(null);
 
   const currentTimer = sequence ? sequence[currentSequenceIndex] : timer;
   const totalDuration = currentTimer.duration;
-  const currentInterval = currentTimer.intervals?.[0] || {};
-  const currentIntervalType = currentInterval.type || 'work';
-  const currentIntervalLabel = currentInterval.label || (currentIntervalType === 'work' ? 'Work' : 'Rest');
-  const circleColor = currentIntervalType === 'work' ? '#4CAF50' : '#FFA000';
+  const currentIntervalLabel = currentTimer.description || 'Work';
+  const circleColor = '#00BFA5';
   
   // SVG Arc calculation
   const progress = timeLeft / totalDuration;
@@ -78,7 +78,13 @@ const TimerScreen = ({ route, navigation }) => {
       setCurrentSequenceIndex(prev => prev + 1);
       setTimeLeft(sequence[currentSequenceIndex + 1].duration);
     } else {
-      setShouldExit(true);
+      if (cycles < totalCycles) {
+        setCycles(prev => prev + 1);
+        setCurrentSequenceIndex(0);
+        setTimeLeft(sequence ? sequence[0].duration : timer.duration);
+      } else {
+        setShouldExit(true);
+      }
     }
   };
 
@@ -103,6 +109,12 @@ const TimerScreen = ({ route, navigation }) => {
     setCurrentSequenceIndex(0);
     setTimeLeft(sequence ? sequence[0].duration : timer.duration);
     setCycles(0);
+  };
+
+  const handleCycleChange = (increment) => {
+    if (!isRunning) {
+      setTotalCycles(prev => Math.max(1, prev + increment));
+    }
   };
 
   const minutes = Math.floor(timeLeft / 60);
@@ -130,8 +142,25 @@ const TimerScreen = ({ route, navigation }) => {
           Timer {currentSequenceIndex + 1} of {sequence.length}
         </Text>
       )}
-      <Text style={styles.cycleCount}>Cycle: {cycles + 1}</Text>
-      
+      <Text style={styles.cycleCount}>
+        Cycle: {cycles}/{totalCycles}
+      </Text>
+
+      <View style={styles.topControls}>
+        <TouchableOpacity 
+          onPress={() => handleCycleChange(-1)}
+          style={styles.cycleButton}
+        >
+          <Text style={styles.cycleButtonText}>-</Text>
+        </TouchableOpacity>
+        <TouchableOpacity 
+          onPress={() => handleCycleChange(1)}
+          style={styles.cycleButton}
+        >
+          <Text style={styles.cycleButtonText}>+</Text>
+        </TouchableOpacity>
+      </View>
+
       <View style={styles.timerContainer}>
         <Svg width={size} height={size}>
           <Circle
@@ -157,30 +186,44 @@ const TimerScreen = ({ route, navigation }) => {
       </View>
 
       <View style={styles.navigationControls}>
-        <Button
-          title="Prev"
+        <TouchableOpacity
           onPress={handlePrev}
-          style={styles.prevButton}
-        />
-        <Button
-          title="Next"
+          style={styles.navButton}
+        >
+          <Ionicons name="chevron-back-sharp" size={24} color="#fff" />
+          <Ionicons name="chevron-back-sharp" size={24} color="#fff" style={styles.overlappingIcon} />
+        </TouchableOpacity>
+        <TouchableOpacity
           onPress={handleNext}
-          style={styles.nextButton}
-        />
+          style={styles.navButton}
+        >
+          <Ionicons name="chevron-forward-sharp" size={24} color="#fff" />
+          <Ionicons name="chevron-forward-sharp" size={24} color="#fff" style={styles.overlappingIcon} />
+        </TouchableOpacity>
       </View>
 
       <View style={styles.controls}>
         {!isRunning ? (
-          <Button title="Start" onPress={handleStart} style={styles.startButton} />
+          <TouchableOpacity onPress={handleStart} style={styles.controlButton}>
+            <Ionicons name="play" size={32} color="#fff" />
+          </TouchableOpacity>
         ) : isPaused ? (
           <>
-            <Button title="Resume" onPress={handleResume} style={styles.resumeButton} />
-            <Button title="Stop" onPress={handleStop} style={styles.stopButton} />
+            <TouchableOpacity onPress={handleResume} style={[styles.controlButton, styles.resumeButton]}>
+              <Ionicons name="play" size={32} color="#fff" />
+            </TouchableOpacity>
+            <TouchableOpacity onPress={handleStop} style={[styles.controlButton, styles.stopButton]}>
+              <Ionicons name="stop" size={32} color="#fff" />
+            </TouchableOpacity>
           </>
         ) : (
           <>
-            <Button title="Pause" onPress={handlePause} style={styles.pauseButton} />
-            <Button title="Stop" onPress={handleStop} style={styles.stopButton} />
+            <TouchableOpacity onPress={handlePause} style={[styles.controlButton, styles.pauseButton]}>
+              <Ionicons name="pause" size={32} color="#fff" />
+            </TouchableOpacity>
+            <TouchableOpacity onPress={handleStop} style={[styles.controlButton, styles.stopButton]}>
+              <Ionicons name="stop" size={32} color="#fff" />
+            </TouchableOpacity>
           </>
         )}
       </View>
@@ -191,7 +234,7 @@ const TimerScreen = ({ route, navigation }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
+    backgroundColor: '#1C1C1E',
     alignItems: 'center',
     padding: 16,
   },
@@ -199,16 +242,18 @@ const styles = StyleSheet.create({
     fontSize: 24,
     fontWeight: 'bold',
     marginBottom: 8,
+    color: '#fff',
   },
   intervalType: {
     fontSize: 18,
     fontWeight: '600',
     marginBottom: 8,
+    color: '#00BFA5',
   },
   cycleCount: {
     fontSize: 16,
-    color: '#666',
-    marginBottom: 24,
+    color: '#8E8E93',
+    marginBottom: 0,
   },
   timerContainer: {
     width: 250,
@@ -222,6 +267,7 @@ const styles = StyleSheet.create({
     position: 'absolute',
     fontSize: 48,
     fontWeight: 'bold',
+    color: '#fff',
   },
   navigationControls: {
     flexDirection: 'row',
@@ -230,39 +276,74 @@ const styles = StyleSheet.create({
     paddingHorizontal: 32,
     marginBottom: 16,
   },
-  prevButton: {
-    width: 100,
-    backgroundColor: '#90CAF9',
+  navButton: {
+    width: 50,
+    height: 50,
+    borderRadius: 25,
+    backgroundColor: '#2C2C2E',
+    justifyContent: 'center',
+    alignItems: 'center',
+    flexDirection: 'row',
   },
-  nextButton: {
-    width: 100,
-    backgroundColor: '#2196F3',
+  controlButton: {
+    width: 64,
+    height: 64,
+    borderRadius: 32,
+    backgroundColor: '#00BFA5',
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   controls: {
     flexDirection: 'row',
     justifyContent: 'center',
-    gap: 16,
+    gap: 24,
+    alignItems: 'center',
   },
   startButton: {
-    backgroundColor: '#4CAF50',
-    width: 120,
+    backgroundColor: '#00BFA5',
   },
   pauseButton: {
-    backgroundColor: '#FFA000',
-    width: 120,
+    backgroundColor: '#FF9F0A',
   },
   resumeButton: {
-    backgroundColor: '#4CAF50',
-    width: 120,
+    backgroundColor: '#00BFA5',
   },
   stopButton: {
-    backgroundColor: '#F44336',
-    width: 120,
+    backgroundColor: '#FF3B30',
   },
   sequenceProgress: {
     fontSize: 16,
-    color: '#666',
+    color: '#8E8E93',
     marginBottom: 8,
+  },
+  overlappingIcon: {
+    marginLeft: -15,
+  },
+  cycleRow: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  cycleButton: {
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    backgroundColor: '#2C2C2E',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  cycleButtonText: {
+    color: '#00BFA5',
+    fontSize: 24,
+    fontWeight: 'bold',
+  },
+  topControls: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    width: '100%',
+    paddingHorizontal: 32,
+    marginTop: -8,
+    marginBottom: 24,
   },
 });
 

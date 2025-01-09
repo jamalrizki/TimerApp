@@ -43,7 +43,7 @@ const TimePicker = ({ hours, minutes, seconds, onChange }) => {
 
   return (
     <View style={styles.pickerOuterContainer}>
-      <LinearGradient
+      {/* <LinearGradient
         colors={['rgba(255,255,255,1)', 'rgba(255,255,255,0)']}
         style={styles.fadeTop}
         pointerEvents="none"
@@ -52,7 +52,7 @@ const TimePicker = ({ hours, minutes, seconds, onChange }) => {
         colors={['rgba(255,255,255,0)', 'rgba(255,255,255,1)']}
         style={styles.fadeBottom}
         pointerEvents="none"
-      />
+      /> */}
       <View style={styles.centerHighlight} pointerEvents="none" />
 
       <View style={styles.pickerContainer}>
@@ -127,6 +127,7 @@ const styles = StyleSheet.create({
     position: 'relative',
     marginBottom: 24,
     height: ITEM_HEIGHT * VISIBLE_ITEMS,
+    backgroundColor: '#1C1C1E',
   },
   pickerContainer: {
     flexDirection: 'row',
@@ -149,11 +150,11 @@ const styles = StyleSheet.create({
   },
   pickerText: {
     fontSize: 24,
-    color: '#000',
+    color: '#fff',
     marginBottom: 8,
   },
   pickerTextFaded: {
-    opacity: 0.4,
+    opacity: 0.8,
   },
   pickerSeparator: {
     fontSize: 24,
@@ -168,8 +169,8 @@ const styles = StyleSheet.create({
     right: 0,
     top: ITEM_HEIGHT * 2,
     height: ITEM_HEIGHT,
-    backgroundColor: 'rgba(0, 122, 255, 0.1)',
-    borderColor: '#007AFF',
+    backgroundColor: 'rgba(0, 191, 165, 0.1)',  // Teal highlight with opacity
+    borderColor: '#00BFA5',  // Teal borders
     borderTopWidth: 1,
     borderBottomWidth: 1,
     zIndex: 10,
@@ -192,12 +193,12 @@ const styles = StyleSheet.create({
   },
   staticUnitLabel: {
     fontSize: 18,
-    color: '#000',
+    color: '#8E8E93',
     position: 'absolute',
     left: '60%',
     top: ITEM_HEIGHT * 2 + 10,
     opacity: 0.6,
-  },
+  }
 });
 
 export default TimePicker; 
