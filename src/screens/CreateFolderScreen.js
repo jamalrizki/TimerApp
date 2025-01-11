@@ -26,6 +26,7 @@ const CreateFolderScreen = ({ navigation }) => {
         value={name}
         onChangeText={setName}
         placeholder="Enter Playlist name"
+        placeholderTextColor="#8E8E93"
       />
       <Button
         title="Create Playlist"
@@ -40,24 +41,26 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: 16,
-    backgroundColor: '#fff',
+    backgroundColor: '#1C1C1E',
   },
   label: {
     fontSize: 16,
     fontWeight: '600',
     marginBottom: 8,
-    color: '#333',
+    color: '#fff',
   },
   input: {
     borderWidth: 1,
-    borderColor: '#ddd',
+    borderColor: '#2C2C2E',
+    backgroundColor: '#2C2C2E',
     borderRadius: 8,
     padding: 12,
     marginBottom: 16,
     fontSize: 16,
+    color: '#fff',
   },
   createButton: {
-    backgroundColor: '#007AFF',
+    backgroundColor: '#00BFA5',
   },
 });
 

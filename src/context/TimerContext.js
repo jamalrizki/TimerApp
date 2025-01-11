@@ -7,27 +7,40 @@ export const TimerContext = createContext();
 export const TimerProvider = ({ children }) => {
   const [timers, setTimers] = useState([]);
   const [folders, setFolders] = useState([]);
+  const [recentTimers, setRecentTimers] = useState([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const loadData = async () => {
-      try {
-        const [savedTimers, savedFolders] = await Promise.all([
-          AsyncStorage.getItem('timers'),
-          AsyncStorage.getItem('folders')
-        ]);
-
-        if (savedTimers) setTimers(JSON.parse(savedTimers));
-        if (savedFolders) setFolders(JSON.parse(savedFolders));
-      } catch (error) {
-        console.error('Error loading data:', error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
     loadData();
   }, []);
+
+  const loadData = async () => {
+    try {
+      const [timersData, foldersData, recentData] = await Promise.all([
+        AsyncStorage.getItem('timers'),
+        AsyncStorage.getItem('folders'),
+        AsyncStorage.getItem('recentTimers')
+      ]);
+
+      setTimers(timersData ? JSON.parse(timersData) : []);
+      setFolders(foldersData ? JSON.parse(foldersData) : []);
+      setRecentTimers(recentData ? JSON.parse(recentData) : []);
+      setLoading(false);
+    } catch (error) {
+      console.error('Error loading data:', error);
+      setLoading(false);
+    }
+  };
+
+  const addRecentTimer = async (timer) => {
+    try {
+      const updatedRecent = [timer, ...recentTimers.slice(0, 4)];
+      await AsyncStorage.setItem('recentTimers', JSON.stringify(updatedRecent));
+      setRecentTimers(updatedRecent);
+    } catch (error) {
+      console.error('Error adding recent timer:', error);
+    }
+  };
 
   const saveTimer = async (newTimer) => {
     try {
@@ -121,6 +134,9 @@ export const TimerProvider = ({ children }) => {
     deleteTimer,
     deleteFolder,
     createFromTemplate,
+    recentTimers,
+    setRecentTimers,
+    addRecentTimer,
   };
 
   return (

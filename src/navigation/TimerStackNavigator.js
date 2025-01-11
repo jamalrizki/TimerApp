@@ -25,7 +25,7 @@ const TimerStackNavigator = () => {
       <Stack.Screen 
         name="MyTimers"
         component={MyTimersScreen}
-        options={{ title: 'My Timers' }}
+        options={{ headerShown: false }}
       />
       <Stack.Screen 
         name="CreateFolder" 

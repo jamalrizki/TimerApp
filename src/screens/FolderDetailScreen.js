@@ -18,7 +18,8 @@ const FolderDetailScreen = ({ route, navigation }) => {
       navigation.navigate('Timer', { 
         timer: folderTimers[0],
         sequence: folderTimers,
-        currentIndex: 0
+        currentIndex: 0,
+        folder: folder
       });
     }
   };
