@@ -28,7 +28,7 @@ const TimerScreen = ({ route, navigation }) => {
   const [showCountdown, setShowCountdown] = useState(false);
 
   const timerRef = useRef(null);
-  const { addRecentTimer } = useTimerContext();
+  const { updateRecentTimers } = useTimerContext();
 
   const currentTimer = sequence ? sequence[currentSequenceIndex] : timer;
   const totalDuration = currentTimer.duration;
@@ -91,27 +91,13 @@ const TimerScreen = ({ route, navigation }) => {
   const handleIntervalComplete = () => {
     clearInterval(timerRef.current);
 
-    if (sequence && currentSequenceIndex < sequence.length - 1) {
-      const nextInterval = sequence[currentSequenceIndex + 1];
-      if (savedSound === "voice") {
-        const textToSpeak =
-          nextInterval.description || nextInterval.name || "Next interval";
-        Speech.speak(textToSpeak, {
-          language: "en",
-          rate: 0.8,
-        });
-      } else {
-        playSound();
-      }
-
-      setCurrentSequenceIndex((prev) => prev + 1);
-      setTimeLeft(sequence[currentSequenceIndex + 1].duration);
-    } else {
-      if (cycles < totalCycles) {
-        const firstInterval = sequence ? sequence[0] : timer;
+    // Check if we're in a sequence and not at the end
+    if (sequence) {
+      if (currentSequenceIndex < sequence.length - 1) {
+        // Move to next timer in sequence
+        const nextInterval = sequence[currentSequenceIndex + 1];
         if (savedSound === "voice") {
-          const textToSpeak =
-            firstInterval.description || firstInterval.name || "Next interval";
+          const textToSpeak = nextInterval.description || nextInterval.name || "Next interval";
           Speech.speak(textToSpeak, {
             language: "en",
             rate: 0.8,
@@ -119,52 +105,72 @@ const TimerScreen = ({ route, navigation }) => {
         } else {
           playSound();
         }
-
-        setCycles((prev) => prev + 1);
+        setCurrentSequenceIndex(prev => prev + 1);
+        setTimeLeft(sequence[currentSequenceIndex + 1].duration);
+      } else if (cycles < totalCycles) {
+        // Start new cycle
+        const firstInterval = sequence[0];
+        if (savedSound === "voice") {
+          const textToSpeak = `Starting cycle ${cycles + 2}. ${firstInterval.description || firstInterval.name || "First interval"}`;
+          Speech.speak(textToSpeak, {
+            language: "en",
+            rate: 0.8,
+          });
+        } else {
+          playSound();
+        }
+        setCycles(prev => prev + 1);
         setCurrentSequenceIndex(0);
-        setTimeLeft(sequence ? sequence[0].duration : timer.duration);
+        setTimeLeft(sequence[0].duration);
       } else {
+        // All cycles complete
         logCompletedSession();
         setIsRunning(false);
-        clearInterval(timerRef.current);
         setShouldExit(true);
       }
+    } else {
+      // Single timer complete
+      logCompletedSession();
+      setIsRunning(false);
+      setShouldExit(true);
     }
   };
 
+  useEffect(() => {
+    if (shouldExit) {
+      setShowCompletion(true);
+    }
+  }, [shouldExit]);
+
   const logCompletedSession = async () => {
     try {
-      const today = new Date();
-      const dateString = `${today.getFullYear()}-${(today.getMonth() + 1)
-        .toString()
-        .padStart(2, "0")}-${today.getDate().toString().padStart(2, "0")}`;
-
-      const savedSessions = await AsyncStorage.getItem("completedSessions");
+      const timestamp = new Date().toISOString();
+      // Save to completed sessions for calendar
+      const savedSessions = await AsyncStorage.getItem('completedSessions');
       const sessions = savedSessions ? JSON.parse(savedSessions) : {};
+      const dateKey = timestamp.split('T')[0];
+      sessions[dateKey] = (sessions[dateKey] || 0) + 1;
+      await AsyncStorage.setItem('completedSessions', JSON.stringify(sessions));
 
-      sessions[dateString] = (sessions[dateString] || 0) + 1;
-      await AsyncStorage.setItem("completedSessions", JSON.stringify(sessions));
-
-      // Add to recent timers
       const folder = route.params.folder;
-      if (folder) {
-        addRecentTimer({
-          id: folder.id,
-          name: folder.name,
-          timestamp: new Date().toISOString(),
-          isSequence: true,
-          sequenceLength: sequence?.length || 1,
-          folderId: folder.id,
-        });
-      } else {
-        addRecentTimer({
-          id: timer.id,
-          name: timer.name,
-          timestamp: new Date().toISOString(),
-        });
-      }
-    } catch {
-      // Handle error silently
+      
+      // Calculate total duration for sequence/playlist
+      const totalDuration = sequence 
+        ? sequence.reduce((sum, t) => sum + t.duration, 0) 
+        : timer.duration;
+      
+      const timerToSave = {
+        id: folder ? folder.id : timer.id,
+        name: folder ? folder.name : timer.name,
+        duration: totalDuration,
+        folderId: folder ? folder.id : timer.folderId,
+        timestamp: timestamp
+      };
+      
+      await updateRecentTimers(timerToSave);
+
+    } catch (error) {
+      console.error('Error logging session:', error);
     }
   };
 
@@ -243,7 +249,15 @@ const TimerScreen = ({ route, navigation }) => {
       const soundMap = {
         beep: require("../../assets/beep.mp3"),
         bell: require("../../assets/bell.mp3"),
-        chime: require("../../assets/chime.mp3"),
+        chimes: require("../../assets/chimes.mp3"),
+        celesta: require("../../assets/celesta.mp3"),
+        crotales: require("../../assets/crotales.mp3"),
+        glockenspiel: require("../../assets/glockenspiel.mp3"),
+        gong: require("../../assets/gong.mp3"),
+        gunshot: require("../../assets/gun-shot.mp3"),
+        tibetan_bowl: require("../../assets/tibetan-bowl.mp3"),
+        toilet_lid: require("../../assets/gong.mp3"),
+        xylophone: require("../../assets/xylophone.mp3"),
       };
       if (savedSound === "voice") return;
 
@@ -303,10 +317,12 @@ const TimerScreen = ({ route, navigation }) => {
     }, [navigation, isRunning])
   );
 
-  const handleCompletionFinished = () => {
-    navigation.dispatch((e) => {
-      return CommonActions.goBack();
-    });
+  const handleCompletionFinish = () => {
+    if (route.params.folder) {
+      navigation.navigate('PlaylistDetail', { folder: route.params.folder });
+    } else {
+      navigation.goBack();
+    }
   };
 
   const loadSoundPreference = async () => {
@@ -336,7 +352,9 @@ const TimerScreen = ({ route, navigation }) => {
     // Announce the first interval
     if (savedSound === "voice") {
       const textToSpeak =
-        currentTimer.description || currentTimer.name || "Start";
+        sequence 
+          ? sequence[currentSequenceIndex].name || 'Interval'
+          : currentTimer.description || currentTimer.name || "Start";
       Speech.speak(textToSpeak, {
         language: "en",
         rate: 0.8,
@@ -346,11 +364,35 @@ const TimerScreen = ({ route, navigation }) => {
     }
   };
 
+  const handleTimerComplete = () => {
+    if (sequence && currentSequenceIndex < sequence.length - 1) {
+      // If there's another timer in the sequence
+      if (savedSound === "voice") {
+        const nextTimer = sequence[currentSequenceIndex + 1];
+        const textToSpeak = nextTimer.description || nextTimer.name || "Next interval";
+        Speech.speak(textToSpeak, {
+          language: "en",
+          rate: 0.8,
+        });
+      } else {
+        playSound();
+      }
+      setCurrentSequenceIndex(currentSequenceIndex + 1);
+      setTimeLeft(sequence[currentSequenceIndex + 1].duration);
+    } else {
+      // Final timer completed
+      clearInterval(timerRef.current);
+      setIsRunning(false);
+      logCompletedSession();
+      setShouldExit(true);
+    }
+  };
+
   return (
     <View style={styles.container}>
       {showCountdown && <Countdown onComplete={handleCountdownComplete} />}
       {showCompletion && (
-        <CompletionModal onComplete={handleCompletionFinished} />
+        <CompletionModal onComplete={handleCompletionFinish} />
       )}
       <Text style={styles.timerName}>{currentTimer.name}</Text>
       <Text style={[styles.intervalType, { color: circleColor }]}>

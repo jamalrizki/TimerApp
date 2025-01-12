@@ -5,6 +5,20 @@ import { useNavigation } from '@react-navigation/native';
 const RecentTimers = ({ timers = [] }) => {
   const navigation = useNavigation();
 
+  const handleTimerPress = (timer) => {
+    navigation.navigate('My Timers', {
+      screen: 'PlaylistDetail',
+      params: {
+        folder: {
+          id: timer.folderId,
+          name: timer.name,
+          createdAt: timer.timestamp,
+          timers: []
+        }
+      }
+    });
+  };
+
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Recent Timers</Text>
@@ -12,15 +26,7 @@ const RecentTimers = ({ timers = [] }) => {
         <TouchableOpacity
           key={timer.id || index}
           style={styles.timerItem}
-          onPress={() => navigation.navigate('My Timers', {
-            screen: 'FolderDetail',
-            params: { 
-              folder: {
-                id: timer.folderId,
-                name: timer.name
-              }
-            }
-          })}
+          onPress={() => handleTimerPress(timer)}
         >
           <Text style={styles.timerName}>{timer.name || 'Unnamed Timer'}</Text>
           <Text style={styles.duration}>

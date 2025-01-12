@@ -1,5 +1,5 @@
 export const createFolderFromTemplate = (template) => {
-  const newFolder = {
+  const newPlaylist = {
     id: Date.now().toString(),
     name: template.name,
     description: template.description,
@@ -9,10 +9,10 @@ export const createFolderFromTemplate = (template) => {
 
   const newTimers = template.timers.map(timer => ({
     ...timer,
-    id: `${newFolder.id}_${timer.id}`,
-    createdAt: newFolder.createdAt,
-    folderId: newFolder.id
+    id: `${newPlaylist.id}_${timer.id}`,
+    createdAt: newPlaylist.createdAt,
+    folderId: newPlaylist.id
   }));
 
-  return { folder: newFolder, timers: newTimers };
+  return { playlist: newPlaylist, timers: newTimers };
 }; 

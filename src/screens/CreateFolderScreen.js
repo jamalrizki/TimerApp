@@ -10,7 +10,7 @@ const CreateFolderScreen = ({ navigation }) => {
   const handleCreate = () => {
     const newFolder = {
       id: Date.now().toString(),
-      name: name || 'New Folder',
+      name: name || 'New Playlist',
       createdAt: new Date().toISOString(),
       timers: [],
     };

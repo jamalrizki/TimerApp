@@ -4,7 +4,7 @@ import MyTimersScreen from '../screens/MyTimersScreen';
 import TimerDetailsScreen from '../screens/TimerDetailsScreen';
 import TimerScreen from '../screens/TimerScreen';
 import CreateFolderScreen from '../screens/CreateFolderScreen';
-import FolderDetailScreen from '../screens/FolderDetailScreen';
+import PlaylistDetailScreen from '../screens/PlaylistDetailScreen';
 
 const Stack = createStackNavigator();
 
@@ -33,8 +33,8 @@ const TimerStackNavigator = () => {
         options={{ title: 'Create Playlist' }}
       />
       <Stack.Screen 
-        name="FolderDetail"
-        component={FolderDetailScreen}
+        name="PlaylistDetail"
+        component={PlaylistDetailScreen}
         options={{ 
           title: 'Playlist Details', 
           headerBackTitle: 'My Timers'

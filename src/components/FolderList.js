@@ -51,7 +51,7 @@ const FolderList = ({ folders, timers, navigation }) => {
             >
               <TouchableOpacity 
                 style={styles.folderItem}
-                onPress={() => navigation.navigate('FolderDetail', { folder })}
+                onPress={() => navigation.navigate('PlaylistDetail', { folder })}
               >
                 <View style={styles.folderContent}>
                   <View style={styles.folderInfo}>

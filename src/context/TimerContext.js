@@ -16,19 +16,33 @@ export const TimerProvider = ({ children }) => {
 
   const loadData = async () => {
     try {
-      const [timersData, foldersData, recentData] = await Promise.all([
+      const [savedTimers, savedFolders, savedRecentTimers] = await Promise.all([
         AsyncStorage.getItem('timers'),
         AsyncStorage.getItem('folders'),
         AsyncStorage.getItem('recentTimers')
       ]);
 
-      setTimers(timersData ? JSON.parse(timersData) : []);
-      setFolders(foldersData ? JSON.parse(foldersData) : []);
-      setRecentTimers(recentData ? JSON.parse(recentData) : []);
+      setTimers(savedTimers ? JSON.parse(savedTimers) : []);
+      setFolders(savedFolders ? JSON.parse(savedFolders) : []);
+      setRecentTimers(savedRecentTimers ? JSON.parse(savedRecentTimers) : []);
       setLoading(false);
     } catch (error) {
       console.error('Error loading data:', error);
       setLoading(false);
+    }
+  };
+
+  const updateRecentTimers = async (newTimer) => {
+    try {
+      const updatedRecentTimers = [
+        newTimer,
+        ...recentTimers.filter(t => t.id !== newTimer.id)
+      ].slice(0, 5);
+      
+      setRecentTimers(updatedRecentTimers);
+      await AsyncStorage.setItem('recentTimers', JSON.stringify(updatedRecentTimers));
+    } catch (error) {
+      console.error('Error updating recent timers:', error);
     }
   };
 
@@ -65,10 +79,10 @@ export const TimerProvider = ({ children }) => {
 
   const createFromTemplate = async (template) => {
     try {
-      const { folder, timers: newTimers } = createFolderFromTemplate(template);
+      const { playlist, timers: newTimers } = createFolderFromTemplate(template);
       
       // Save the folder
-      const updatedFolders = [...(folders || []), folder];
+      const updatedFolders = [...(folders || []), playlist];
       await AsyncStorage.setItem('folders', JSON.stringify(updatedFolders));
       setFolders(updatedFolders);
       
@@ -137,6 +151,7 @@ export const TimerProvider = ({ children }) => {
     recentTimers,
     setRecentTimers,
     addRecentTimer,
+    updateRecentTimers,
   };
 
   return (

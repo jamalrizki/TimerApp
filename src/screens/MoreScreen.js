@@ -5,7 +5,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useTimerContext } from '../hooks/useTimerContext';
 
 const MoreScreen = ({ navigation }) => {
-  const { setTimers, setFolders } = useTimerContext();
+  const { setTimers, setFolders, setRecentTimers } = useTimerContext();
 
   const handleClearData = () => {
     Alert.alert(
@@ -26,6 +26,7 @@ const MoreScreen = ({ navigation }) => {
               await AsyncStorage.setItem('selectedSound', currentSound);
               setTimers([]);
               setFolders([]);
+              setRecentTimers([]);
               Alert.alert('Success', 'All data has been cleared');
             } catch (error) {
               Alert.alert('Error', 'Failed to clear data');

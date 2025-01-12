@@ -10,7 +10,8 @@ const IdeasScreen = () => {
     navigation.navigate('Timer', {
       timer: template.timers[0],
       sequence: template.timers,
-      currentIndex: 0
+      currentIndex: 0,
+      isTemplate: true
     });
   };
 

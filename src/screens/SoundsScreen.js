@@ -8,7 +8,15 @@ const SOUNDS = [
   { id: 'voice', name: 'Voice', isVoice: true },
   { id: 'beep', name: 'Beep', file: require('../../assets/beep.mp3') },
   { id: 'bell', name: 'Bell', file: require('../../assets/bell.mp3') },
-  { id: 'chime', name: 'Chime', file: require('../../assets/chime.mp3') },
+  { id: 'chimes', name: 'Chimes', file: require('../../assets/chimes.mp3') },
+  { id: 'celesta', name: 'Celesta', file: require('../../assets/celesta.mp3') },
+  { id: 'crotales', name: 'Crotales', file: require('../../assets/crotales.mp3') },
+  { id: 'glockenspiel', name: 'Glockenspiel', file: require('../../assets/glockenspiel.mp3') },
+  { id: 'gong', name: 'Gong', file: require('../../assets/gong.mp3') },
+  { id: 'gunshot', name: 'Gunshot', file: require('../../assets/gun-shot.mp3') },
+  { id: 'tibetan_bowl', name: 'Tibetan Bowl', file: require('../../assets/tibetan-bowl.mp3') },
+  { id: 'toilet_lid', name: 'Toilet Lid', file: require('../../assets/gong.mp3') },
+  { id: 'xylophone', name: 'Xylophone', file: require('../../assets/xylophone.mp3') },
 ];
 
 const SoundsScreen = () => {

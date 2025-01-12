@@ -1,11 +1,11 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, ScrollView } from 'react-native';
 import { useTimerContext } from '../hooks/useTimerContext';
 import RecentTimers from '../components/RecentTimers';
 import WelcomeMessage from '../components/WelcomeMessage';
 
 const HomeScreen = () => {
-  const { timers, loading } = useTimerContext();
+  const { timers, loading, recentTimers } = useTimerContext();
 
   if (loading) {
     return (
@@ -18,7 +18,7 @@ const HomeScreen = () => {
   return (
     <ScrollView style={styles.container}>
       <WelcomeMessage />
-      <RecentTimers timers={timers.slice(0, 3)} />
+      <RecentTimers timers={recentTimers} />
     </ScrollView>
   );
 };
