@@ -96,7 +96,9 @@ const TimerScreen = ({ route, navigation }) => {
       if (currentSequenceIndex < sequence.length - 1) {
         // Move to next timer in sequence
         const nextInterval = sequence[currentSequenceIndex + 1];
-        if (savedSound === "voice") {
+        if (savedSound === "off") {
+          // Do nothing - sound is off
+        } else if (savedSound === "voice") {
           const textToSpeak = nextInterval.description || nextInterval.name || "Next interval";
           Speech.speak(textToSpeak, {
             language: "en",
@@ -110,7 +112,9 @@ const TimerScreen = ({ route, navigation }) => {
       } else if (cycles < totalCycles) {
         // Start new cycle
         const firstInterval = sequence[0];
-        if (savedSound === "voice") {
+        if (savedSound === "off") {
+          // Do nothing - sound is off
+        } else if (savedSound === "voice") {
           const textToSpeak = `Starting cycle ${cycles + 2}. ${firstInterval.description || firstInterval.name || "First interval"}`;
           Speech.speak(textToSpeak, {
             language: "en",
@@ -216,20 +220,19 @@ const TimerScreen = ({ route, navigation }) => {
   };
 
   useEffect(() => {
-    const setupAudio = async () => {
+    const configureAudio = async () => {
       try {
         await Audio.setAudioModeAsync({
-          allowsRecordingIOS: false,
           playsInSilentModeIOS: true,
           staysActiveInBackground: true,
           shouldDuckAndroid: true,
         });
-      } catch {
-        // Silently handle audio setup errors
+      } catch (error) {
+        console.log('Error setting audio mode:', error);
       }
     };
 
-    setupAudio();
+    configureAudio();
   }, []);
 
   useEffect(() => {
@@ -259,7 +262,7 @@ const TimerScreen = ({ route, navigation }) => {
         toilet_lid: require("../../assets/gong.mp3"),
         xylophone: require("../../assets/xylophone.mp3"),
       };
-      if (savedSound === "voice") return;
+      if (savedSound === "off") return;
 
       if (!soundMap[savedSound]) {
         return;
@@ -350,7 +353,9 @@ const TimerScreen = ({ route, navigation }) => {
     setIsRunning(true);
     setIsPaused(false);
     // Announce the first interval
-    if (savedSound === "voice") {
+    if (savedSound === "off") {
+      // Do nothing - sound is off
+    } else if (savedSound === "voice") {
       const textToSpeak =
         sequence 
           ? sequence[currentSequenceIndex].name || 'Interval'
@@ -367,7 +372,9 @@ const TimerScreen = ({ route, navigation }) => {
   const handleTimerComplete = () => {
     if (sequence && currentSequenceIndex < sequence.length - 1) {
       // If there's another timer in the sequence
-      if (savedSound === "voice") {
+      if (savedSound === "off") {
+        // Do nothing - sound is off
+      } else if (savedSound === "voice") {
         const nextTimer = sequence[currentSequenceIndex + 1];
         const textToSpeak = nextTimer.description || nextTimer.name || "Next interval";
         Speech.speak(textToSpeak, {

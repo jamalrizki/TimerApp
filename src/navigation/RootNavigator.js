@@ -6,6 +6,7 @@ import HomeScreen from '../screens/HomeScreen';
 import TimerStackNavigator from './TimerStackNavigator';
 import IdeasStackNavigator from './IdeasStackNavigator';
 import MoreStackNavigator from './MoreStackNavigator';
+import MyTimersStackNavigator from './MyTimersStackNavigator';
 
 const Tab = createBottomTabNavigator();
 
@@ -32,7 +33,7 @@ const RootNavigator = () => {
             iconName = focused ? 'home-sharp' : 'home-outline';
           } else if (route.name === 'My Timers') {
             iconName = focused ? 'stopwatch' : 'stopwatch-outline';
-          } else if (route.name === 'Ideas') {
+          } else if (route.name === 'Explore') {
             iconName = focused ? 'bulb-sharp' : 'bulb-outline';
           } else if (route.name === 'More') {
             iconName = focused ? 'menu-sharp' : 'menu-outline';
@@ -43,9 +44,21 @@ const RootNavigator = () => {
       })}
     >
       <Tab.Screen name="Home" component={HomeScreen} />
-      <Tab.Screen name="My Timers" component={TimerStackNavigator} />
-      <Tab.Screen name="Ideas" component={IdeasStackNavigator} />
-      <Tab.Screen name="More" component={MoreStackNavigator} />
+      <Tab.Screen 
+        name="My Timers" 
+        component={MyTimersStackNavigator}
+        options={{
+          headerShown: false
+        }}
+      />
+      <Tab.Screen name="Explore" component={IdeasStackNavigator} />
+      <Tab.Screen 
+        name="More" 
+        component={MoreStackNavigator} 
+        options={{
+          headerShown: false
+        }}
+      />
     </Tab.Navigator>
   );
 };

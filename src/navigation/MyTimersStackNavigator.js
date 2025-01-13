@@ -24,12 +24,17 @@ const MyTimersStackNavigator = () => {
       <Stack.Screen 
         name="MyTimers" 
         component={MyTimersScreen}
-        options={{ headerShown: false }}
+        options={{ 
+          title: 'My Timer Playlist'
+        }}
       />
       <Stack.Screen 
         name="PlaylistDetail"
         component={PlaylistDetailScreen}
-        options={{ title: 'Playlist Details' }}
+        options={{ 
+          title: 'Playlist Details',
+          headerBackTitle: 'Back'
+        }}
       />
       <Stack.Screen 
         name="TimerDetails" 

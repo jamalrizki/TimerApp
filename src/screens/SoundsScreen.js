@@ -5,6 +5,7 @@ import { Audio } from 'expo-av';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const SOUNDS = [
+  { id: 'off', name: 'Sound Off', isOff: true },
   { id: 'voice', name: 'Voice', isVoice: true },
   { id: 'beep', name: 'Beep', file: require('../../assets/beep.mp3') },
   { id: 'bell', name: 'Bell', file: require('../../assets/bell.mp3') },
@@ -53,7 +54,7 @@ const SoundsScreen = () => {
     setSelectedSound(soundId);
     try {
       await AsyncStorage.setItem('selectedSound', soundId);
-      if (soundId !== 'voice') {
+      if (soundId !== 'voice' && soundId !== 'off') {
         const soundItem = SOUNDS.find(s => s.id === soundId);
         if (soundItem && soundItem.file) {
           playSound(soundItem.file);
@@ -66,7 +67,6 @@ const SoundsScreen = () => {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Timer Sounds</Text>
       <ScrollView>
         {SOUNDS.map((item) => (
           <TouchableOpacity
@@ -77,10 +77,10 @@ const SoundsScreen = () => {
             <View style={styles.soundInfo}>
               <TouchableOpacity
                 style={styles.playButton}
-                onPress={() => !item.isVoice && playSound(item.file)}
+                onPress={() => !item.isVoice && !item.isOff && playSound(item.file)}
               >
                 <Ionicons 
-                  name={item.isVoice ? "mic-outline" : "play"} 
+                  name={item.isOff ? "volume-mute-outline" : item.isVoice ? "mic-outline" : "play"}
                   size={24} 
                   color="#00BFA5" 
                 />
@@ -102,13 +102,6 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#1C1C1E',
     padding: 16,
-  },
-  title: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    color: '#fff',
-    marginBottom: 24,
-    marginTop: 60,
   },
   soundItem: {
     flexDirection: 'row',

@@ -63,6 +63,17 @@ const MoreScreen = ({ navigation }) => {
       </TouchableOpacity>
 
       <TouchableOpacity 
+        style={styles.menuItem}
+        onPress={() => navigation.navigate('Contact')}
+      >
+        <View style={styles.menuItemContent}>
+          <Ionicons name="mail-outline" size={24} color="#00BFA5" />
+          <Text style={styles.menuItemText}>Contact Us</Text>
+        </View>
+        <Ionicons name="chevron-forward" size={24} color="#8E8E93" />
+      </TouchableOpacity>
+
+      <TouchableOpacity 
         style={[styles.menuItem, styles.dangerItem]} 
         onPress={handleClearData}
       >

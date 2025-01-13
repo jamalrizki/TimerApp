@@ -1,6 +1,7 @@
 import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
+import { Ionicons } from '@expo/vector-icons';
 
 const RecentTimers = ({ timers = [] }) => {
   const navigation = useNavigation();
@@ -29,10 +30,12 @@ const RecentTimers = ({ timers = [] }) => {
           onPress={() => handleTimerPress(timer)}
         >
           <Text style={styles.timerName}>{timer.name || 'Unnamed Timer'}</Text>
-          <Text style={styles.duration}>
-            {Math.floor(timer.duration / 60)}:
-            {(timer.duration % 60).toString().padStart(2, '0')}
-          </Text>
+          <TouchableOpacity 
+            style={styles.playButton}
+            onPress={() => handleTimerPress(timer)}
+          >
+            <Ionicons name="play" size={20} color="#00BFA5" />
+          </TouchableOpacity>
         </TouchableOpacity>
       ))}
       {timers.length === 0 && (
@@ -73,6 +76,14 @@ const styles = StyleSheet.create({
   emptyText: {
     color: '#8E8E93',
     fontStyle: 'italic',
+  },
+  playButton: {
+    width: 32,
+    height: 32,
+    borderRadius: 16,
+    backgroundColor: '#1C1C1E',
+    justifyContent: 'center',
+    alignItems: 'center',
   },
 });
 

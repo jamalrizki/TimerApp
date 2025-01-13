@@ -3,6 +3,7 @@ import { createStackNavigator } from '@react-navigation/stack';
 import MoreScreen from '../screens/MoreScreen';
 import SoundsScreen from '../screens/SoundsScreen';
 import CalendarScreen from '../screens/CalendarScreen';
+import ContactScreen from '../screens/ContactScreen';
 
 const Stack = createStackNavigator();
 
@@ -17,22 +18,36 @@ const MoreStackNavigator = () => {
           color: '#fff',
         },
         headerTintColor: '#00BFA5',
+        headerBackTitle: 'Back',
       }}
     >
       <Stack.Screen 
-        name="MoreScreen" 
+        name="MoreScreen"
         component={MoreScreen}
-        options={{ headerShown: false }}
+        options={{ 
+          title: 'More'
+        }}
       />
       <Stack.Screen 
         name="Sounds" 
         component={SoundsScreen}
-        options={{ title: 'Timer Sounds' }}
+        options={{ 
+          title: 'Timer Sounds'
+        }}
       />
       <Stack.Screen 
         name="Calendar" 
         component={CalendarScreen}
-        options={{ title: 'Session History' }}
+        options={{ 
+          title: 'Session History'
+        }}
+      />
+      <Stack.Screen 
+        name="Contact" 
+        component={ContactScreen}
+        options={{ 
+          title: 'Contact',
+        }}
       />
     </Stack.Navigator>
   );

@@ -64,8 +64,6 @@ const PlaylistDetailScreen = ({ route, navigation }) => {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.folderName}>{folder.name}</Text>
-      
       <View style={styles.buttonContainer}>
         <Button 
           title="Add Interval"
@@ -118,12 +116,6 @@ const styles = StyleSheet.create({
     flex: 1,
     padding: 16,
     backgroundColor: '#1C1C1E',
-  },
-  folderName: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    marginBottom: 16,
-    color: '#fff',
   },
   buttonContainer: {
     flexDirection: 'row',

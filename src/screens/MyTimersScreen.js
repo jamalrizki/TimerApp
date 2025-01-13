@@ -17,7 +17,6 @@ const MyTimersScreen = ({ navigation }) => {
 
   return (
     <ScrollView style={styles.container}>
-      <Text style={styles.title}>My Timer Playlist</Text>
       <Button 
         title="Create New Playlist"
         onPress={() => navigation.navigate('CreateFolder')}
@@ -37,12 +36,6 @@ const styles = StyleSheet.create({
     flex: 1,
     padding: 16,
     backgroundColor: '#1C1C1E',
-  },
-  title: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    marginBottom: 16,
-    color: '#fff',
   },
   createButton: {
     marginBottom: 16,

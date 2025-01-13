@@ -17,8 +17,8 @@ const IdeasScreen = () => {
 
   return (
     <ScrollView style={styles.container}>
-      <Text style={styles.title}>Timer Templates</Text>
-      <Text style={styles.subtitle}>Choose a template to get started</Text>
+      <Text style={styles.title}>Discover Routines</Text>
+      <Text style={styles.subtitle}>Simple routines for your daily practice</Text>
       
       {timerTemplates.map(template => (
         <TouchableOpacity
