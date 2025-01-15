@@ -1,6 +1,7 @@
 import React, { createContext, useState, useContext, useEffect } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { createFolderFromTemplate } from '../utils/templateUtils';
+import { timerTemplates } from '../constants/timerTemplates';
 
 export const TimerContext = createContext();
 
@@ -48,7 +49,27 @@ export const TimerProvider = ({ children }) => {
 
   const addRecentTimer = async (timer) => {
     try {
-      const updatedRecent = [timer, ...recentTimers.slice(0, 4)];
+      // Check if this timer is part of a preset template
+      const preset = timerTemplates.find(template => 
+        template.timers.some(t => t.id === timer.id)
+      );
+
+      // If it's a preset timer, store the entire preset information
+      const timerToStore = preset ? {
+        id: preset.id,
+        name: preset.name,
+        description: preset.description,
+        presetId: preset.id,
+        isPreset: true,
+        sequence: preset.timers // Store the entire sequence
+      } : timer;
+
+      // Filter out duplicates based on id or presetId
+      const filteredRecent = recentTimers.filter(rt => 
+        rt.presetId ? rt.presetId !== timerToStore.presetId : rt.id !== timerToStore.id
+      );
+
+      const updatedRecent = [timerToStore, ...filteredRecent.slice(0, 4)];
       await AsyncStorage.setItem('recentTimers', JSON.stringify(updatedRecent));
       setRecentTimers(updatedRecent);
     } catch (error) {

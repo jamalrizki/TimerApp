@@ -26,6 +26,7 @@ const RootNavigator = () => {
         },
         tabBarActiveTintColor: '#00BFA5',
         tabBarInactiveTintColor: '#fff',
+        headerShown: false,
         tabBarIcon: ({ focused, color, size }) => {
           let iconName;
 
@@ -47,17 +48,14 @@ const RootNavigator = () => {
       <Tab.Screen 
         name="My Timers" 
         component={MyTimersStackNavigator}
-        options={{
-          headerShown: false
-        }}
       />
-      <Tab.Screen name="Explore" component={IdeasStackNavigator} />
+      <Tab.Screen 
+        name="Explore" 
+        component={IdeasStackNavigator}
+      />
       <Tab.Screen 
         name="More" 
-        component={MoreStackNavigator} 
-        options={{
-          headerShown: false
-        }}
+        component={MoreStackNavigator}
       />
     </Tab.Navigator>
   );

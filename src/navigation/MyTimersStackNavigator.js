@@ -19,6 +19,7 @@ const MyTimersStackNavigator = () => {
           color: '#fff',
         },
         headerTintColor: '#00BFA5',
+        headerBackTitle: 'Back',
       }}
     >
       <Stack.Screen 
@@ -40,18 +41,25 @@ const MyTimersStackNavigator = () => {
         name="TimerDetails" 
         component={TimerDetailsScreen}
         options={({ route }) => ({ 
-          title: route.params?.timer ? 'Timer Details' : 'Create Timer'
+          title: route.params?.timer ? 'Timer Details' : 'Create Timer',
+          headerBackTitle: 'Back'
         })}
       />
       <Stack.Screen 
         name="Timer" 
         component={TimerScreen}
-        options={{ title: 'Timer' }}
+        options={{ 
+          title: 'Timer',
+          headerBackTitle: 'Back'
+        }}
       />
       <Stack.Screen 
         name="CreateFolder" 
         component={CreateFolderScreen}
-        options={{ title: 'Create Playlist' }}
+        options={{ 
+          title: 'Create Playlist',
+          headerBackTitle: 'Back'
+        }}
       />
     </Stack.Navigator>
   );

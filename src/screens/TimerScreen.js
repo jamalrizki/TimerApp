@@ -11,6 +11,7 @@ import CompletionModal from "../components/CompletionModal";
 import { CommonActions } from "@react-navigation/native";
 import Countdown from "../components/Countdown";
 import { useTimerContext } from "../hooks/useTimerContext";
+import { timerTemplates } from "../constants/timerTemplates";
 
 const TimerScreen = ({ route, navigation }) => {
   const { timer, sequence, currentIndex: initialIndex = 0 } = route.params;
@@ -28,7 +29,7 @@ const TimerScreen = ({ route, navigation }) => {
   const [showCountdown, setShowCountdown] = useState(false);
 
   const timerRef = useRef(null);
-  const { updateRecentTimers } = useTimerContext();
+  const { updateRecentTimers, addRecentTimer } = useTimerContext();
 
   const currentTimer = sequence ? sequence[currentSequenceIndex] : timer;
   const totalDuration = currentTimer.duration;
@@ -156,23 +157,35 @@ const TimerScreen = ({ route, navigation }) => {
       sessions[dateKey] = (sessions[dateKey] || 0) + 1;
       await AsyncStorage.setItem('completedSessions', JSON.stringify(sessions));
 
-      const folder = route.params.folder;
-      
-      // Calculate total duration for sequence/playlist
-      const totalDuration = sequence 
-        ? sequence.reduce((sum, t) => sum + t.duration, 0) 
-        : timer.duration;
-      
-      const timerToSave = {
-        id: folder ? folder.id : timer.id,
-        name: folder ? folder.name : timer.name,
-        duration: totalDuration,
-        folderId: folder ? folder.id : timer.folderId,
-        timestamp: timestamp
-      };
-      
-      await updateRecentTimers(timerToSave);
+      // If this is part of a playlist (folder)
+      if (route.params.folder) {
+        const playlistTimer = {
+          id: route.params.folder.id,
+          name: route.params.folder.name,
+          folderId: route.params.folder.id,
+          sequence: sequence
+        };
+        addRecentTimer(playlistTimer);
+      } else {
+        // Find if this is part of a preset
+        const preset = timerTemplates.find(template => 
+          template.timers.some(t => t.id === timer.id)
+        );
 
+        if (preset) {
+          const presetTimer = {
+            id: preset.id,
+            name: preset.name,
+            description: preset.description,
+            presetId: preset.id,
+            sequence: preset.timers
+          };
+          addRecentTimer(presetTimer);
+        } else {
+          // Regular timer
+          addRecentTimer(timer);
+        }
+      }
     } catch (error) {
       console.error('Error logging session:', error);
     }
@@ -223,6 +236,7 @@ const TimerScreen = ({ route, navigation }) => {
     const configureAudio = async () => {
       try {
         await Audio.setAudioModeAsync({
+          allowsRecordingIOS: false,
           playsInSilentModeIOS: true,
           staysActiveInBackground: true,
           shouldDuckAndroid: true,
@@ -277,11 +291,70 @@ const TimerScreen = ({ route, navigation }) => {
     }
   };
 
-  // Prevent accidental back navigation
+  const handleBackNavigation = () => {
+    if (route.params?.fromRecent) {
+      // If coming from recent timers, reset the stack to IdeasList
+      navigation.reset({
+        index: 0,
+        routes: [{ name: 'IdeasList' }],
+      });
+    } else {
+      navigation.goBack();
+    }
+  };
+
+  // Update the useEffect for navigation options
+  useEffect(() => {
+    navigation.setOptions({
+      headerShown: true,
+      headerLeft: () => (
+        <TouchableOpacity 
+          onPress={() => {
+            if (isRunning) {
+              Alert.alert(
+                "Quit Timer?",
+                "Are you sure you want to quit? Your progress will be lost.",
+                [
+                  {
+                    text: "Cancel",
+                    style: "cancel",
+                  },
+                  {
+                    text: "Quit",
+                    style: "destructive",
+                    onPress: handleBackNavigation,
+                  },
+                ]
+              );
+            } else {
+              handleBackNavigation();
+            }
+          }}
+          style={{ 
+            marginLeft: 16,
+            flexDirection: 'row',
+            alignItems: 'center'
+          }}
+        >
+          <Ionicons name="chevron-back" size={24} color="#00BFA5" />
+          <Text style={{ 
+            color: '#00BFA5',
+            marginLeft: 4,
+            fontSize: 17
+          }}>
+            Back
+          </Text>
+        </TouchableOpacity>
+      ),
+    });
+  }, [isRunning, route.params?.fromRecent]);
+
+  // Replace the existing useFocusEffect with this updated version
   useFocusEffect(
     React.useCallback(() => {
       const backHandler = navigation.addListener("beforeRemove", (e) => {
         if (!isRunning) {
+          // Allow back navigation if timer isn't running
           return;
         }
 
@@ -301,28 +374,39 @@ const TimerScreen = ({ route, navigation }) => {
               text: "Cancel",
               style: "cancel",
               onPress: () => {
-                // Resume the timer if user cancels
                 setIsPaused(false);
               },
             },
             {
               text: "Quit",
               style: "destructive",
-              onPress: () => navigation.dispatch(e.data.action),
+              onPress: () => {
+                navigation.dispatch(e.data.action);
+              },
             },
           ]
         );
       });
 
-      return () => {
-        backHandler();
-      };
-    }, [navigation, isRunning])
+      return backHandler;
+    }, [isRunning, navigation])
   );
 
   const handleCompletionFinish = () => {
     if (route.params.folder) {
-      navigation.navigate('PlaylistDetail', { folder: route.params.folder });
+      // If we came from a playlist, reset the stack to MyTimers and then navigate to PlaylistDetail
+      navigation.dispatch(
+        CommonActions.reset({
+          index: 2,
+          routes: [
+            { name: 'MyTimers' },
+            { 
+              name: 'PlaylistDetail', 
+              params: { folder: route.params.folder }
+            }
+          ],
+        })
+      );
     } else {
       navigation.goBack();
     }
@@ -394,6 +478,22 @@ const TimerScreen = ({ route, navigation }) => {
       setShouldExit(true);
     }
   };
+
+  useEffect(() => {
+    // When the timer screen first loads, if it's part of a sequence
+    // add the sequence to recent timers only once at the start
+    if (route.params.sequence && currentSequenceIndex === 0) {
+      const preset = timerTemplates.find(template => 
+        template.timers.some(t => t.id === route.params.timer.id)
+      );
+      if (preset) {
+        addRecentTimer(route.params.timer);
+      }
+    } else if (!route.params.sequence) {
+      // If it's a single timer, add it normally
+      addRecentTimer(route.params.timer);
+    }
+  }, []);
 
   return (
     <View style={styles.container}>

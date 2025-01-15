@@ -21,7 +21,10 @@ const IdeasStackNavigator = () => {
       <Stack.Screen 
         name="IdeasList"
         component={IdeasScreen}
-        options={{ headerShown: false }}
+        options={{ 
+          title: 'Explore',
+          headerShown: true  // Show header for main Explore screen
+        }}
       />
       <Stack.Screen 
         name="Timer" 

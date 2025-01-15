@@ -1,26 +1,32 @@
 import React from 'react';
-import { View, Text, StyleSheet, Image } from 'react-native';
+import { View, Text, StyleSheet, Image, SafeAreaView } from 'react-native';
 
 const WelcomeMessage = () => {
   return (
-    <View style={styles.container}>
-      <View style={styles.heroContainer}>
-        <Image
-          source={require('../../assets/hour-glass.jpeg')}
-          style={styles.heroImage}
-          resizeMode="cover"
-        />
-        <Text style={styles.overlayText}>OmniTimer</Text>
+    <SafeAreaView style={styles.safeArea}>
+      <View style={styles.container}>
+        <View style={styles.heroContainer}>
+          <Image
+            source={require('../../assets/hour-glass.jpeg')}
+            style={styles.heroImage}
+            resizeMode="cover"
+          />
+          <Text style={styles.overlayText}>OmniTimer</Text>
+        </View>
+        <Text style={styles.title}>Welcome to OmniTimer</Text>
+        <Text style={styles.subtitle}>
+          The multi-purpose interval app that adapts to you. From fitness and meditation to Pomodoro and more, get started now and make every second count.
+        </Text>
       </View>
-      <Text style={styles.title}>Welcome to OmniTimer</Text>
-      <Text style={styles.subtitle}>
-      The multi-purpose interval app that adapts to you. From fitness and meditation to Pomodoro and more, get started now and make every second count.
-      </Text>
-    </View>
+    </SafeAreaView>
   );
 };
 
 const styles = StyleSheet.create({
+  safeArea: {
+    flex: 1,
+    backgroundColor: '#1C1C1E',
+  },
   container: {
     padding: 16,
   },
@@ -30,13 +36,13 @@ const styles = StyleSheet.create({
   },
   heroImage: {
     width: '100%',
-    height: 200,
+    height: 230,
     borderRadius: 12,
   },
   overlayText: {
     position: 'absolute',
-    bottom: 16,
-    left: 1,
+    bottom: 4,
+    left: 2,
     color: '#fff',
     fontSize: 32,
     fontWeight: 'bold',

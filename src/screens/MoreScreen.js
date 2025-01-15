@@ -10,7 +10,7 @@ const MoreScreen = ({ navigation }) => {
   const handleClearData = () => {
     Alert.alert(
       'Clear All Data',
-      'This will reset all your timers and history. This action cannot be undone.',
+      'This will reset all your timers, history, and settings. This action cannot be undone.',
       [
         {
           text: 'Cancel',
@@ -21,9 +21,7 @@ const MoreScreen = ({ navigation }) => {
           style: 'destructive',
           onPress: async () => {
             try {
-              const currentSound = await AsyncStorage.getItem('selectedSound') || 'voice';
               await AsyncStorage.clear();
-              await AsyncStorage.setItem('selectedSound', currentSound);
               setTimers([]);
               setFolders([]);
               setRecentTimers([]);
