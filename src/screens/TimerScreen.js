@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
-import { View, Text, StyleSheet, TouchableOpacity, Alert } from "react-native";
+import { View, Text, StyleSheet, TouchableOpacity, Alert, BackHandler } from "react-native";
 import Svg, { Circle, Path } from "react-native-svg";
 import { Ionicons } from "@expo/vector-icons";
 import Button from "../components/Button";
@@ -27,6 +27,7 @@ const TimerScreen = ({ route, navigation }) => {
   const [sound, setSound] = useState();
   const [savedSound, setSavedSound] = useState("voice");
   const [showCountdown, setShowCountdown] = useState(false);
+  const [isAlertShowing, setIsAlertShowing] = useState(false);
 
   const timerRef = useRef(null);
   const { updateRecentTimers, addRecentTimer } = useTimerContext();
@@ -291,45 +292,57 @@ const TimerScreen = ({ route, navigation }) => {
     }
   };
 
-  const handleBackNavigation = () => {
-    if (route.params?.fromRecent) {
-      // If coming from recent timers, reset the stack to IdeasList
-      navigation.reset({
-        index: 0,
-        routes: [{ name: 'IdeasList' }],
-      });
-    } else {
-      navigation.goBack();
-    }
-  };
+  // Single source of truth for back handling
+  const handleBackPress = React.useCallback(() => {
+    if (!isRunning) return false;
+    
+    // Prevent multiple alerts
+    if (isAlertShowing) return true;
+    
+    setIsAlertShowing(true);
+    setIsPaused(true);
+    clearInterval(timerRef.current);
 
-  // Update the useEffect for navigation options
+    Alert.alert(
+      "Quit Timer?",
+      "Are you sure you want to quit? Your progress will be lost.",
+      [
+        {
+          text: "Cancel",
+          style: "cancel",
+          onPress: () => {
+            setIsAlertShowing(false);
+            setIsPaused(false);
+          },
+        },
+        {
+          text: "Quit",
+          style: "destructive",
+          onPress: () => {
+            setIsAlertShowing(false);
+            navigation.goBack();
+          },
+        },
+      ]
+    );
+    return true;
+  }, [isRunning, navigation, isAlertShowing]);
+
+  // Hardware back button
+  useEffect(() => {
+    const backHandler = BackHandler.addEventListener(
+      'hardwareBackPress',
+      handleBackPress
+    );
+    return () => backHandler.remove();
+  }, [handleBackPress]);
+
+  // Navigation back button
   useEffect(() => {
     navigation.setOptions({
-      headerShown: true,
       headerLeft: () => (
         <TouchableOpacity 
-          onPress={() => {
-            if (isRunning) {
-              Alert.alert(
-                "Quit Timer?",
-                "Are you sure you want to quit? Your progress will be lost.",
-                [
-                  {
-                    text: "Cancel",
-                    style: "cancel",
-                  },
-                  {
-                    text: "Quit",
-                    style: "destructive",
-                    onPress: handleBackNavigation,
-                  },
-                ]
-              );
-            } else {
-              handleBackNavigation();
-            }
-          }}
+          onPress={handleBackPress}
           style={{ 
             marginLeft: 16,
             flexDirection: 'row',
@@ -347,50 +360,14 @@ const TimerScreen = ({ route, navigation }) => {
         </TouchableOpacity>
       ),
     });
-  }, [isRunning, route.params?.fromRecent]);
+  }, [handleBackPress]);
 
-  // Replace the existing useFocusEffect with this updated version
-  useFocusEffect(
-    React.useCallback(() => {
-      const backHandler = navigation.addListener("beforeRemove", (e) => {
-        if (!isRunning) {
-          // Allow back navigation if timer isn't running
-          return;
-        }
-
-        // Prevent default behavior of leaving the screen
-        e.preventDefault();
-
-        // Pause the timer
-        setIsPaused(true);
-        clearInterval(timerRef.current);
-
-        // Prompt the user before leaving the screen
-        Alert.alert(
-          "Quit Timer?",
-          "Are you sure you want to quit? Your progress will be lost.",
-          [
-            {
-              text: "Cancel",
-              style: "cancel",
-              onPress: () => {
-                setIsPaused(false);
-              },
-            },
-            {
-              text: "Quit",
-              style: "destructive",
-              onPress: () => {
-                navigation.dispatch(e.data.action);
-              },
-            },
-          ]
-        );
-      });
-
-      return backHandler;
-    }, [isRunning, navigation])
-  );
+  // Remove the beforeRemove listener if it exists
+  useEffect(() => {
+    return () => {
+      navigation.removeListener('beforeRemove', handleBackPress);
+    };
+  }, [navigation, handleBackPress]);
 
   const handleCompletionFinish = () => {
     if (route.params.folder) {

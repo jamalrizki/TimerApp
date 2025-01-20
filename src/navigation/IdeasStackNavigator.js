@@ -14,7 +14,10 @@ const IdeasStackNavigator = () => {
         },
         headerTitleStyle: {
           color: '#fff',
+          alignSelf: 'center',
+          textAlign: 'center',
         },
+        headerTitleAlign: 'center',
         headerTintColor: '#00BFA5',
       }}
     >

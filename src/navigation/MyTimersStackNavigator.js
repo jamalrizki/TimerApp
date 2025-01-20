@@ -17,7 +17,10 @@ const MyTimersStackNavigator = () => {
         },
         headerTitleStyle: {
           color: '#fff',
+          alignSelf: 'center',
+          textAlign: 'center',
         },
+        headerTitleAlign: 'center',
         headerTintColor: '#00BFA5',
         headerBackTitle: 'Back',
       }}
