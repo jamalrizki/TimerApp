@@ -18,7 +18,7 @@ const MyTimersScreen = ({ navigation }) => {
   return (
     <ScrollView style={styles.container}>
       <Button 
-        title="Create New Playlist"
+        title="Create New Routine"
         onPress={() => navigation.navigate('CreateFolder')}
         style={styles.createButton}
       />

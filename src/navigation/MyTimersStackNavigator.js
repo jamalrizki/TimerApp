@@ -26,7 +26,7 @@ const MyTimersStackNavigator = () => {
         name="MyTimers" 
         component={MyTimersScreen}
         options={{ 
-          title: 'My Timer Playlist'
+          title: 'My Routines'
         }}
       />
       <Stack.Screen 
@@ -57,7 +57,7 @@ const MyTimersStackNavigator = () => {
         name="CreateFolder" 
         component={CreateFolderScreen}
         options={{ 
-          title: 'Create Playlist',
+          title: 'Create Routine',
           headerBackTitle: 'Back'
         }}
       />

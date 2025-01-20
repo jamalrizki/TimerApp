@@ -32,7 +32,7 @@ const RootNavigator = () => {
 
           if (route.name === 'Home') {
             iconName = focused ? 'home-sharp' : 'home-outline';
-          } else if (route.name === 'My Timers') {
+          } else if (route.name === 'My Routines') {
             iconName = focused ? 'stopwatch' : 'stopwatch-outline';
           } else if (route.name === 'Explore') {
             iconName = focused ? 'bulb-sharp' : 'bulb-outline';
@@ -46,7 +46,7 @@ const RootNavigator = () => {
     >
       <Tab.Screen name="Home" component={HomeScreen} />
       <Tab.Screen 
-        name="My Timers" 
+        name="My Routines" 
         component={MyTimersStackNavigator}
       />
       <Tab.Screen 

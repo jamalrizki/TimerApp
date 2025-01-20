@@ -12,10 +12,10 @@ const FolderList = ({ folders, timers, navigation }) => {
   return (
     <View style={styles.container}>
       <View style={styles.header}>
-        <Text style={styles.title}>Playlists</Text>
+        <Text style={styles.title}>Routines</Text>
       </View>
       {folders.length === 0 ? (
-        <Text style={styles.emptyText}>No Playlists yet</Text>
+        <Text style={styles.emptyText}>No Routines yet</Text>
       ) : (
         folders.map((folder) => {
           const folderTimers = timers.filter(timer => 

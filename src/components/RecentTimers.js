@@ -22,7 +22,7 @@ const RecentTimers = ({ timers = [] }) => {
       });
     } else if (timer.folderId) {
       // If it's a playlist timer, navigate to the playlist
-      navigation.navigate('My Timers', {
+      navigation.navigate('My Routines', {
         screen: 'PlaylistDetail',
         params: {
           folder: {
@@ -34,7 +34,7 @@ const RecentTimers = ({ timers = [] }) => {
       });
     } else {
       // If it's a single custom timer
-      navigation.navigate('My Timers', {
+      navigation.navigate('My Routines', {
         screen: 'Timer',
         params: {
           timer: timer,
