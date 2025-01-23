@@ -1,7 +1,7 @@
 {
   "expo": {
-    "name": "OmniTimer",
-    "slug": "OmniTimer",
+    "name": "PureIntervals",
+    "slug": "PureIntervals",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
@@ -13,22 +13,31 @@
       "backgroundColor": "#ffffff"
     },
     "ios": {
-      "bundleIdentifier": "com.jrizki.omnitimer",
+      "bundleIdentifier": "com.jrizki.PureIntervals",
       "supportsTablet": true,
       "infoPlist": {
-        "UIBackgroundModes": ["audio"]
+        "UIBackgroundModes": [
+          "audio"
+        ]
       }
     },
     "android": {
-      "package": "com.jrizki.omnitimer",
+      "package": "com.jrizki.PureIntervals",
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
       },
-      "permissions": ["FOREGROUND_SERVICE"]
+      "permissions": [
+        "FOREGROUND_SERVICE"
+      ]
     },
     "web": {
       "favicon": "./assets/favicon.png"
+    },
+    "extra": {
+      "eas": {
+        "projectId": "f040a456-04f9-41f0-ac76-5e83d15148a3"
+      }
     }
   }
 }

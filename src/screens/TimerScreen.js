@@ -117,7 +117,7 @@ const TimerScreen = ({ route, navigation }) => {
         if (savedSound === "off") {
           // Do nothing - sound is off
         } else if (savedSound === "voice") {
-          const textToSpeak = `Starting cycle ${cycles + 2}. ${firstInterval.description || firstInterval.name || "First interval"}`;
+          const textToSpeak = `Starting cycle ${cycles + 1}. ${firstInterval.description || firstInterval.name || "First interval"}`;
           Speech.speak(textToSpeak, {
             language: "en",
             rate: 0.8,

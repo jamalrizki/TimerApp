@@ -11,9 +11,9 @@ const WelcomeMessage = () => {
             style={styles.heroImage}
             resizeMode="cover"
           />
-          <Text style={styles.overlayText}>OmniTimer</Text>
+          <Text style={styles.overlayText}>PureIntervals</Text>
         </View>
-        <Text style={styles.title}>Welcome to OmniTimer</Text>
+        <Text style={styles.title}>Welcome to PureIntervals</Text>
         <Text style={styles.subtitle}>
           The multi-purpose interval app that adapts to you. From fitness and meditation to Pomodoro and more, get started now and make every second count.
         </Text>
