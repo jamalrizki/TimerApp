@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
-import { View, Text, StyleSheet, TouchableOpacity, Alert, BackHandler } from "react-native";
+import { View, Text, StyleSheet, TouchableOpacity, Alert, BackHandler, AppState } from "react-native";
 import Svg, { Circle, Path } from "react-native-svg";
 import { Ionicons } from "@expo/vector-icons";
 import Button from "../components/Button";
@@ -52,8 +52,10 @@ const TimerScreen = ({ route, navigation }) => {
   }, [shouldExit]);
 
   useEffect(() => {
+    let intervalId;
+    
     if (isRunning && !isPaused) {
-      timerRef.current = setInterval(() => {
+      intervalId = setInterval(() => {
         setTimeLeft((prev) => {
           if (prev <= 1) {
             handleIntervalComplete();
@@ -62,8 +64,21 @@ const TimerScreen = ({ route, navigation }) => {
           return prev - 1;
         });
       }, 1000);
+      
+      timerRef.current = intervalId;
     }
-    return () => clearInterval(timerRef.current);
+
+    const subscription = AppState.addEventListener('change', nextAppState => {
+      if (nextAppState === 'active') {
+        // App has come to the foreground
+        loadSoundPreference();
+      }
+    });
+
+    return () => {
+      clearInterval(intervalId);
+      subscription.remove();
+    };
   }, [isRunning, isPaused, currentSequenceIndex]);
 
   const handleNext = () => {
@@ -101,7 +116,7 @@ const TimerScreen = ({ route, navigation }) => {
         if (savedSound === "off") {
           // Do nothing - sound is off
         } else if (savedSound === "voice") {
-          const textToSpeak = nextInterval.description || nextInterval.name || "Next interval";
+          const textToSpeak = nextInterval.name || nextInterval.description || "Next interval";
           Speech.speak(textToSpeak, {
             language: "en",
             rate: 0.8,
@@ -117,7 +132,7 @@ const TimerScreen = ({ route, navigation }) => {
         if (savedSound === "off") {
           // Do nothing - sound is off
         } else if (savedSound === "voice") {
-          const textToSpeak = `Starting cycle ${cycles + 1}. ${firstInterval.description || firstInterval.name || "First interval"}`;
+          const textToSpeak = `Cycle ${cycles + 1}. ${firstInterval.name || firstInterval.description || "First interval"}`;
           Speech.speak(textToSpeak, {
             language: "en",
             rate: 0.8,
@@ -136,9 +151,25 @@ const TimerScreen = ({ route, navigation }) => {
       }
     } else {
       // Single timer complete
-      logCompletedSession();
-      setIsRunning(false);
-      setShouldExit(true);
+      if (cycles < totalCycles) {
+        setCycles(prev => prev + 1);
+        setTimeLeft(timer.duration);
+        if (savedSound === "off") {
+          // Do nothing - sound is off
+        } else if (savedSound === "voice") {
+          const textToSpeak = `Starting cycle ${cycles + 1}. ${timer.description || timer.name || "Timer"}`;
+          Speech.speak(textToSpeak, {
+            language: "en",
+            rate: 0.8,
+          });
+        } else {
+          playSound();
+        }
+      } else {
+        logCompletedSession();
+        setIsRunning(false);
+        setShouldExit(true);
+      }
     }
   };
 
@@ -294,7 +325,10 @@ const TimerScreen = ({ route, navigation }) => {
 
   // Single source of truth for back handling
   const handleBackPress = React.useCallback(() => {
-    if (!isRunning) return false;
+    if (!isRunning) {
+      navigation.goBack();
+      return true;
+    }
     
     // Prevent multiple alerts
     if (isAlertShowing) return true;
@@ -437,7 +471,7 @@ const TimerScreen = ({ route, navigation }) => {
         // Do nothing - sound is off
       } else if (savedSound === "voice") {
         const nextTimer = sequence[currentSequenceIndex + 1];
-        const textToSpeak = nextTimer.description || nextTimer.name || "Next interval";
+        const textToSpeak = nextTimer.name || nextTimer.description || "Next interval";
         Speech.speak(textToSpeak, {
           language: "en",
           rate: 0.8,

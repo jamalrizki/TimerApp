@@ -10,14 +10,16 @@
     "splash": {
       "image": "./assets/splash-icon.png",
       "resizeMode": "contain",
-      "backgroundColor": "#ffffff"
+      "backgroundColor": "#29292929"
     },
     "ios": {
       "bundleIdentifier": "com.jrizki.PureIntervals",
       "supportsTablet": true,
       "infoPlist": {
         "UIBackgroundModes": [
-          "audio"
+          "audio",
+          "fetch",
+          "processing"
         ]
       }
     },
@@ -25,7 +27,7 @@
       "package": "com.jrizki.PureIntervals",
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
-        "backgroundColor": "#ffffff"
+        "backgroundColor": "#292929"
       },
       "permissions": [
         "FOREGROUND_SERVICE"

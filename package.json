@@ -28,7 +28,8 @@
     "react-native-screens": "~4.4.0",
     "react-native-svg": "^15.10.1",
     "expo-speech": "~13.0.0",
-    "lottie-react-native": "7.1.0"
+    "lottie-react-native": "7.1.0",
+    "expo-keep-awake": "~14.0.2"
   },
   "devDependencies": {
     "@babel/core": "^7.20.0"
