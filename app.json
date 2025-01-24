@@ -15,12 +15,15 @@
     "ios": {
       "bundleIdentifier": "com.jrizki.PureIntervals",
       "supportsTablet": true,
-      "buildNumber": "3",
+      "buildNumber": "4",
       "infoPlist": {
         "UIBackgroundModes": [
           "audio",
           "fetch",
           "processing"
+        ],
+        "BGTaskSchedulerPermittedIdentifiers": [
+          "com.jrizki.PureIntervals.timer"
         ]
       }
     },
