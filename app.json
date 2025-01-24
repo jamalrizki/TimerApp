@@ -10,7 +10,7 @@
     "splash": {
       "image": "./assets/splash-icon.png",
       "resizeMode": "contain",
-      "backgroundColor": "#29292929"
+      "backgroundColor": "#292929"
     },
     "ios": {
       "bundleIdentifier": "com.jrizki.PureIntervals",
