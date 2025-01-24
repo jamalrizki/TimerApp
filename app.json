@@ -15,6 +15,7 @@
     "ios": {
       "bundleIdentifier": "com.jrizki.PureIntervals",
       "supportsTablet": true,
+      "buildNumber": "3",
       "infoPlist": {
         "UIBackgroundModes": [
           "audio",
