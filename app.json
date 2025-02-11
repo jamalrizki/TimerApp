@@ -2,7 +2,7 @@
   "expo": {
     "name": "PureIntervals",
     "slug": "PureIntervals",
-    "version": "1.0.1",
+    "version": "1.0.2",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
@@ -15,17 +15,7 @@
     "ios": {
       "bundleIdentifier": "com.jrizki.PureIntervals",
       "supportsTablet": true,
-      "buildNumber": "4",
-      "infoPlist": {
-        "UIBackgroundModes": [
-          "audio",
-          "fetch",
-          "processing"
-        ],
-        "BGTaskSchedulerPermittedIdentifiers": [
-          "com.jrizki.PureIntervals.timer"
-        ]
-      }
+      "buildNumber": "5"
     },
     "android": {
       "package": "com.jrizki.PureIntervals",

@@ -265,23 +265,6 @@ const TimerScreen = ({ route, navigation }) => {
   };
 
   useEffect(() => {
-    const configureAudio = async () => {
-      try {
-        await Audio.setAudioModeAsync({
-          allowsRecordingIOS: false,
-          playsInSilentModeIOS: true,
-          staysActiveInBackground: true,
-          shouldDuckAndroid: true,
-        });
-      } catch (error) {
-        console.log('Error setting audio mode:', error);
-      }
-    };
-
-    configureAudio();
-  }, []);
-
-  useEffect(() => {
     return sound
       ? () => {
           sound.unloadAsync();
@@ -504,6 +487,22 @@ const TimerScreen = ({ route, navigation }) => {
       // If it's a single timer, add it normally
       addRecentTimer(route.params.timer);
     }
+  }, []);
+
+  useEffect(() => {
+    const configureAudio = async () => {
+      try {
+        await Audio.setAudioModeAsync({
+          allowsRecordingIOS: false,
+          playsInSilentModeIOS: true,
+          shouldDuckAndroid: true
+        });
+      } catch (error) {
+        console.log('Error setting audio mode:', error);
+      }
+    };
+
+    configureAudio();
   }, []);
 
   return (
